@@ -48,6 +48,7 @@ def collection_diagnostics(records: list[dict[str, Any]], *, sample_limit: int =
     """Create a safe, deterministic report for tuning aliases without exposing API credentials."""
     statuses = Counter(str(row.get("review_status") or "missing") for row in records)
     games = Counter(str(row["canonical_game_id"]) for row in records if row.get("canonical_game_id"))
+    categories = Counter(str(row.get("category_id") or "missing") for row in records)
     candidates = [row for row in records if row.get("review_status") != "auto"]
     candidates.sort(
         key=lambda row: (
@@ -60,6 +61,7 @@ def collection_diagnostics(records: list[dict[str, Any]], *, sample_limit: int =
         {
             "raw_title": row.get("raw_title", ""),
             "channel_title": row.get("channel_title", ""),
+            "category_id": row.get("category_id"),
             "concurrent_viewers": row.get("concurrent_viewers"),
             "subscriber_count": row.get("subscriber_count"),
             "review_status": row.get("review_status"),
@@ -76,6 +78,7 @@ def collection_diagnostics(records: list[dict[str, Any]], *, sample_limit: int =
         ),
         "record_count": len(records),
         "status_counts": dict(sorted(statuses.items())),
+        "category_counts": dict(sorted(categories.items())),
         "classified_games": dict(sorted(games.items())),
         "unpublished_samples": samples,
     }

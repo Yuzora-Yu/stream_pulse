@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from src.aggregate import aggregate_snapshot, aggregate_window, eligible
+from src.collector import YouTubeClient
 from src.normalize import GameNormalizer, normalize_text
 from src.pipeline import PublicationGuardError, collection_diagnostics, make_summary, recent_raw_keys
 from src.r2_store import R2Store
@@ -39,6 +40,18 @@ class NormalizationTests(unittest.TestCase):
         )
         self.assertEqual(result.review_status, "excluded")
 
+    def test_source_category_exclusion_wins(self):
+        result = self.normalizer.classify(
+            {
+                "raw_title": "Minecraft live",
+                "description": "",
+                "channel_id": "x",
+                "source_excluded_reason": "video_category:24",
+            }
+        )
+        self.assertEqual(result.review_status, "excluded")
+        self.assertEqual(result.excluded_reason, "video_category:24")
+
     def test_additional_japanese_game_alias(self):
         result = self.normalizer.classify(
             {"raw_title": "【原神】螺旋に挑戦", "description": "", "channel_id": "x"}
@@ -64,7 +77,71 @@ class NormalizationTests(unittest.TestCase):
             ]
         )
         self.assertEqual(diagnostics["status_counts"], {"hold": 2})
+        self.assertEqual(diagnostics["category_counts"], {"missing": 2})
         self.assertEqual(diagnostics["unpublished_samples"][0]["raw_title"], "unknown high")
+
+
+class CollectorTests(unittest.TestCase):
+    def test_search_uses_supported_part_and_category_is_verified_after_fetch(self):
+        requests = []
+
+        class FakeYouTubeClient(YouTubeClient):
+            def _get(self, endpoint, params):
+                requests.append((endpoint, params))
+                if endpoint == "search":
+                    return {
+                        "items": [
+                            {"id": {"videoId": "gaming"}},
+                            {"id": {"videoId": "music"}},
+                        ]
+                    }
+                if endpoint == "videos":
+                    return {
+                        "items": [
+                            {
+                                "id": "gaming",
+                                "snippet": {
+                                    "channelId": "channel-1",
+                                    "channelTitle": "Gamer",
+                                    "title": "Minecraft live",
+                                    "categoryId": "20",
+                                },
+                                "liveStreamingDetails": {"concurrentViewers": "100"},
+                                "statistics": {},
+                            },
+                            {
+                                "id": "music",
+                                "snippet": {
+                                    "channelId": "channel-2",
+                                    "channelTitle": "Musician",
+                                    "title": "Music live",
+                                    "categoryId": "10",
+                                },
+                                "liveStreamingDetails": {"concurrentViewers": "200"},
+                                "statistics": {},
+                            },
+                        ]
+                    }
+                if endpoint == "channels":
+                    return {"items": []}
+                raise AssertionError(endpoint)
+
+        client = FakeYouTubeClient("test-key")
+        records = client.collect(
+            {
+                "region_code": "JP",
+                "relevance_language": "ja",
+                "video_category_id": "20",
+                "search_pages": 2,
+                "search_page_size": 50,
+            }
+        )
+
+        search_params = requests[0][1]
+        self.assertEqual(search_params["part"], "snippet")
+        self.assertNotIn("videoCategoryId", search_params)
+        self.assertNotIn("source_excluded_reason", records[0])
+        self.assertEqual(records[1]["source_excluded_reason"], "video_category:10")
 
 
 class AggregationTests(unittest.TestCase):

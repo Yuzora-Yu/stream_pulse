@@ -46,7 +46,6 @@ class YouTubeClient:
         *,
         region_code: str = "JP",
         relevance_language: str = "ja",
-        video_category_id: str = "20",
         pages: int = 2,
         page_size: int = 50,
     ) -> list[str]:
@@ -54,13 +53,12 @@ class YouTubeClient:
         token: str | None = None
         for _ in range(max(1, pages)):
             params: dict[str, Any] = {
-                "part": "id",
+                "part": "snippet",
                 "type": "video",
                 "eventType": "live",
                 "order": "viewCount",
                 "regionCode": region_code,
                 "relevanceLanguage": relevance_language,
-                "videoCategoryId": video_category_id,
                 "maxResults": min(50, max(1, page_size)),
             }
             if token:
@@ -120,6 +118,7 @@ class YouTubeClient:
                     "video_id": video.get("id"),
                     "channel_id": snippet.get("channelId"),
                     "channel_title": snippet.get("channelTitle", ""),
+                    "category_id": snippet.get("categoryId"),
                     "raw_title": snippet.get("title", ""),
                     "description": snippet.get("description", ""),
                     "published_at": snippet.get("publishedAt"),
@@ -137,11 +136,18 @@ class YouTubeClient:
         ids = self.discover_live_video_ids(
             region_code=settings.get("region_code", "JP"),
             relevance_language=settings.get("relevance_language", "ja"),
-            video_category_id=settings.get("video_category_id", "20"),
             pages=int(settings.get("search_pages", 2)),
             page_size=int(settings.get("search_page_size", 50)),
         )
-        return self.fetch_live_details(ids)
+        records = self.fetch_live_details(ids)
+        expected_category = str(settings.get("video_category_id", "")).strip()
+        if expected_category:
+            for record in records:
+                if str(record.get("category_id") or "") != expected_category:
+                    record["source_excluded_reason"] = (
+                        f"video_category:{record.get('category_id') or 'missing'}"
+                    )
+        return records
 
 
 def _int_or_none(value: Any) -> int | None:

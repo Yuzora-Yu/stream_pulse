@@ -20,6 +20,12 @@ Until R2 credentials exist, the scheduled workflow performs one real YouTube col
 
 Classification diagnostics are retained as a separate short-lived artifact on every run, including blocked publications. The report contains public stream metadata needed to tune aliases, but never credentials or environment values.
 
+## 2026-08-28: Discover broadly, verify the gaming category after enrichment
+
+Status: accepted
+
+The live search requests the documented `snippet` part without a category constraint, then verifies each candidate's `snippet.categoryId` from `videos.list`. Non-gaming candidates remain in raw evidence and diagnostics as explicitly excluded rows, but can never enter public rankings. This avoids treating an empty category-filtered search result as proof that no gaming streams are live while preserving the two-search-requests-per-run quota budget.
+
 ## 2026-08-28: Public data source is injected at build time
 
 Status: accepted

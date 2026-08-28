@@ -49,6 +49,8 @@ class GameNormalizer:
         self.excluded_channels = set(exclusions.get("channel_ids", []))
 
     def classify(self, record: dict[str, Any]) -> Classification:
+        if record.get("source_excluded_reason"):
+            return self._excluded(str(record["source_excluded_reason"]))
         title = normalize_text(record.get("raw_title", ""))
         description = normalize_text(record.get("description", ""))
         if record.get("channel_id") in self.excluded_channels:
