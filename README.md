@@ -6,7 +6,7 @@ YouTube Gaming の上位ライブ候補を30分ごとに観測し、配信者数
 
 - ローカルの収集・正規化・LIVE/24h集計、デモ UI、Methodology、GitHub Actions の品質ゲートは実装済みです。
 - `YOUTUBE_API_KEY` だけでも、定期ワークフローが実測センサーを検証し、`stream-pulse-live-probe` artifact を7日間保存します。
-- 30分履歴と公開 `latest.json` を継続運用するには、Cloudflare R2 の資格情報と公開 URL の設定が必要です。
+- 30分履歴と last-good `latest.json` は private R2 に保存し、成功した収集後に GitHub Pages へ実測JSONを同梱します。
 - Google Sheets / Spark の監査台帳は接続確認コードまでで、review queue の自動同期と監査履歴 UI は未実装です。
 
 詳しい完成度は [docs/STATUS.md](docs/STATUS.md) を参照してください。
@@ -49,9 +49,8 @@ Repository secret:
 Repository variable:
 
 - `R2_BUCKET`
-- Pages/Cloudflare Pages のビルドで実測 JSON を読む場合は `R2_PUBLIC_BASE_URL`
 
-`R2_PUBLIC_BASE_URL` をビルド環境に設定すると、`npm run build` が `summary/latest.json` の HTTPS URL を `dist/index.html` に埋め込みます。未設定時は、実測値と誤認させない `DEMO DATA` を同梱します。
+GitHub Pages のデプロイは資格情報をブラウザへ渡さず、private R2 の last-good データをビルド時に取得します。単独のローカルビルドは、実測値と誤認させない `DEMO DATA` を同梱します。外部ホスティングで `R2_PUBLIC_BASE_URL` を明示した場合だけ、HTTPS の公開R2 URLを参照できます。
 
 ## データ保全
 

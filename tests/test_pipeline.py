@@ -1,10 +1,12 @@
 import json
+import tempfile
 import unittest
 from datetime import UTC, datetime
 from pathlib import Path
 
 from src.aggregate import aggregate_snapshot, aggregate_window, eligible
 from src.collector import YouTubeClient
+from src.export_latest import export_latest, validate_public_summary
 from src.normalize import GameNormalizer, normalize_text
 from src.pipeline import PublicationGuardError, collection_diagnostics, make_summary, recent_raw_keys
 from src.r2_store import R2Store
@@ -248,6 +250,31 @@ class StorageWindowTests(unittest.TestCase):
 
         store = FakeR2Store("bucket", "account", "key", "secret")
         self.assertEqual(store.list_keys("raw/", limit=2), ["raw/003", "raw/004"])
+
+
+class PublicExportTests(unittest.TestCase):
+    def test_exports_validated_live_summary(self):
+        summary = {
+            "meta": {"status": "live", "observed_at": "2026-08-28T13:54:45Z"},
+            "rankings": {"live": [{"game_id": "minecraft"}], "last_24h": []},
+        }
+
+        class FakeStore:
+            def get_json(self, key):
+                self.key = key
+                return summary
+
+        store = FakeStore()
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "data" / "latest.json"
+            exported = export_latest(output, store=store)
+            self.assertEqual(json.loads(output.read_text(encoding="utf-8")), summary)
+        self.assertEqual(store.key, "summary/latest.json")
+        self.assertEqual(exported, summary)
+
+    def test_rejects_empty_or_non_live_publication(self):
+        with self.assertRaises(RuntimeError):
+            validate_public_summary({"meta": {"status": "demo"}, "rankings": {"live": []}})
 
 
 if __name__ == "__main__":

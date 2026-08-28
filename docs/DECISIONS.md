@@ -38,6 +38,8 @@ Status: accepted
 
 Pages deployment uploads `dist/`, not the repository root. This keeps Python, tests, configuration, and raw fixtures outside the public site and guarantees that the same build validation used locally controls the deployed artifact.
 
+The production Pages build exports the validated last-good summary from private R2 and bundles it under `dist/data/latest.json`. A successful collection triggers a new Pages deployment. R2 credentials remain server-side in Actions, and the bucket does not require a public URL or browser CORS policy.
+
 ## Format compatibility
 
 The current public document uses `schema_version: 1`. Any future incompatible change requires an explicit reader/migration path. Unknown versions must not be silently rewritten or treated as version 1.
