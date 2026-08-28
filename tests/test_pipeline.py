@@ -132,6 +132,7 @@ class CollectorTests(unittest.TestCase):
                 "region_code": "JP",
                 "relevance_language": "ja",
                 "video_category_id": "20",
+                "search_query": "ゲーム|game|gaming|実況|配信",
                 "search_pages": 2,
                 "search_page_size": 50,
             }
@@ -139,6 +140,7 @@ class CollectorTests(unittest.TestCase):
 
         search_params = requests[0][1]
         self.assertEqual(search_params["part"], "snippet")
+        self.assertEqual(search_params["q"], "ゲーム|game|gaming|実況|配信")
         self.assertNotIn("videoCategoryId", search_params)
         self.assertNotIn("source_excluded_reason", records[0])
         self.assertEqual(records[1]["source_excluded_reason"], "video_category:10")

@@ -24,7 +24,7 @@ Classification diagnostics are retained as a separate short-lived artifact on ev
 
 Status: accepted
 
-The live search requests the documented `snippet` part without a category constraint, then verifies each candidate's `snippet.categoryId` from `videos.list`. Non-gaming candidates remain in raw evidence and diagnostics as explicitly excluded rows, but can never enter public rankings. This avoids treating an empty category-filtered search result as proof that no gaming streams are live while preserving the two-search-requests-per-run quota budget.
+The live search requests the documented `snippet` part without a category constraint, using one OR query for Japanese/English gaming and streaming terms. It then verifies each candidate's `snippet.categoryId` from `videos.list`. Non-gaming candidates remain in raw evidence and diagnostics as explicitly excluded rows, but can never enter public rankings. This avoids treating an empty unqualified or category-filtered search result as proof that no gaming streams are live while preserving the two-search-requests-per-run quota budget.
 
 ## 2026-08-28: Public data source is injected at build time
 

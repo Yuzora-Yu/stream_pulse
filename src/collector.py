@@ -46,6 +46,7 @@ class YouTubeClient:
         *,
         region_code: str = "JP",
         relevance_language: str = "ja",
+        query: str | None = None,
         pages: int = 2,
         page_size: int = 50,
     ) -> list[str]:
@@ -61,6 +62,8 @@ class YouTubeClient:
                 "relevanceLanguage": relevance_language,
                 "maxResults": min(50, max(1, page_size)),
             }
+            if query:
+                params["q"] = query
             if token:
                 params["pageToken"] = token
             payload = self._get("search", params)
@@ -136,6 +139,7 @@ class YouTubeClient:
         ids = self.discover_live_video_ids(
             region_code=settings.get("region_code", "JP"),
             relevance_language=settings.get("relevance_language", "ja"),
+            query=settings.get("search_query"),
             pages=int(settings.get("search_pages", 2)),
             page_size=int(settings.get("search_page_size", 50)),
         )

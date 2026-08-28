@@ -174,6 +174,14 @@ def collect_and_publish(
         records = YouTubeClient(api_key).collect(settings)
     normalized = normalize_records(records, normalizer)
     diagnostics = collection_diagnostics(normalized)
+    if not fixture:
+        diagnostics["discovery"] = {
+            "region_code": settings.get("region_code", "JP"),
+            "relevance_language": settings.get("relevance_language", "ja"),
+            "query": settings.get("search_query"),
+            "requested_pages": int(settings.get("search_pages", 2)),
+            "page_size": int(settings.get("search_page_size", 50)),
+        }
     if diagnostics_output:
         write_json(diagnostics_output, diagnostics)
     if not diagnostics["classified_games"]:

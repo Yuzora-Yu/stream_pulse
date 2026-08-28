@@ -4,6 +4,7 @@
   "relevance_language": "ja",
   "video_category_id": "20",
   "observation_interval_minutes": 30,
+  "search_query": "ゲーム|game|gaming|実況|配信",
   "search_pages": 2,
   "search_page_size": 50,
   "cutoff": {
