@@ -7,7 +7,7 @@ from pathlib import Path
 from src.aggregate import aggregate_snapshot, aggregate_window, eligible
 from src.collector import YouTubeClient
 from src.export_latest import export_latest, validate_public_summary
-from src.normalize import GameNormalizer, normalize_text
+from src.normalize import GameNormalizer, contains_alias, normalize_text
 from src.pipeline import PublicationGuardError, collection_diagnostics, make_summary, recent_raw_keys
 from src.r2_store import R2Store
 
@@ -28,6 +28,10 @@ class NormalizationTests(unittest.TestCase):
 
     def test_nfkc_and_case(self):
         self.assertEqual(normalize_text("  ＶＡＬＯＲＡＮＴ　LIVE "), "valorant live")
+
+    def test_short_latin_alias_requires_token_boundaries(self):
+        self.assertTrue(contains_alias("league of legends / lol", "lol"))
+        self.assertFalse(contains_alias("a lollipop game", "lol"))
 
     def test_alias_classification(self):
         result = self.normalizer.classify(
@@ -60,6 +64,21 @@ class NormalizationTests(unittest.TestCase):
         )
         self.assertEqual(result.canonical_game_id, "genshin-impact")
         self.assertEqual(result.review_status, "auto")
+
+    def test_observed_game_aliases(self):
+        cases = {
+            "GTA 5 LIVE #gaming": "grand-theft-auto-v",
+            "【DBD】ライブ配信": "dead-by-daylight",
+            "【ブルアカ】100回記念": "blue-archive",
+            "【#鳴潮 /初見実況】メインストーリー": "wuthering-waves",
+        }
+        for title, game_id in cases.items():
+            with self.subTest(title=title):
+                result = self.normalizer.classify(
+                    {"raw_title": title, "description": "", "channel_id": "x"}
+                )
+                self.assertEqual(result.canonical_game_id, game_id)
+                self.assertEqual(result.review_status, "auto")
 
     def test_collection_diagnostics_prioritizes_high_viewer_unknowns(self):
         diagnostics = collection_diagnostics(

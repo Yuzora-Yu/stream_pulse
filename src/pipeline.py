@@ -47,7 +47,11 @@ def normalize_records(records: list[dict[str, Any]], normalizer: GameNormalizer)
 def collection_diagnostics(records: list[dict[str, Any]], *, sample_limit: int = 100) -> dict[str, Any]:
     """Create a safe, deterministic report for tuning aliases without exposing API credentials."""
     statuses = Counter(str(row.get("review_status") or "missing") for row in records)
-    games = Counter(str(row["canonical_game_id"]) for row in records if row.get("canonical_game_id"))
+    games = Counter(
+        str(row["canonical_game_id"])
+        for row in records
+        if row.get("canonical_game_id") and row.get("review_status") == "auto"
+    )
     categories = Counter(str(row.get("category_id") or "missing") for row in records)
     candidates = [row for row in records if row.get("review_status") != "auto"]
     candidates.sort(

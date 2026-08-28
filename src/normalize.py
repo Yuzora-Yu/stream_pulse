@@ -12,6 +12,14 @@ def normalize_text(value: str) -> str:
     return value.strip()
 
 
+def contains_alias(text: str, alias: str) -> bool:
+    if not alias:
+        return False
+    left = r"(?<![a-z0-9])" if alias[0].isascii() and alias[0].isalnum() else ""
+    right = r"(?![a-z0-9])" if alias[-1].isascii() and alias[-1].isalnum() else ""
+    return re.search(f"{left}{re.escape(alias)}{right}", text) is not None
+
+
 @dataclass(frozen=True)
 class Classification:
     canonical_game_id: str | None
@@ -66,10 +74,10 @@ class GameNormalizer:
         evidence: dict[str, list[str]] = {}
         for game_id, aliases in self.aliases.items():
             for alias in aliases:
-                if alias and alias in title:
+                if contains_alias(title, alias):
                     scores[game_id] = max(scores.get(game_id, 0), 0.98 if title == alias else 0.9)
                     evidence.setdefault(game_id, []).append(f"title:{alias}")
-                elif alias and alias in description:
+                elif contains_alias(description, alias):
                     scores[game_id] = max(scores.get(game_id, 0), 0.62)
                     evidence.setdefault(game_id, []).append(f"description:{alias}")
 

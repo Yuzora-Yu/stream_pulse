@@ -14,6 +14,26 @@
   "final-fantasy-xiv": {"display_name": "FINAL FANTASY XIV", "status": "active"},
   "mahjong-soul": {"display_name": "雀魂", "status": "active"},
   "dragon-quest-x": {"display_name": "ドラゴンクエストX", "status": "active"},
-  "mario-kart-world": {"display_name": "マリオカート ワールド", "status": "active"}
+  "mario-kart-world": {"display_name": "マリオカート ワールド", "status": "active"},
+  "grand-theft-auto-v": {"display_name": "Grand Theft Auto V", "status": "active"},
+  "free-fire": {"display_name": "Free Fire", "status": "active"},
+  "roblox-grow-a-garden": {"display_name": "Grow a Garden", "status": "active"},
+  "super-smash-bros-ultimate": {"display_name": "大乱闘スマッシュブラザーズ SPECIAL", "status": "active"},
+  "romancing-saga-re-universe": {"display_name": "ロマンシング サガ リ・ユニバース", "status": "active"},
+  "dead-by-daylight": {"display_name": "Dead by Daylight", "status": "active"},
+  "dragon-quest-iii": {"display_name": "ドラゴンクエストIII", "status": "active"},
+  "granblue-fantasy": {"display_name": "グランブルーファンタジー", "status": "active"},
+  "girls-frontline-2": {"display_name": "ドールズフロントライン2", "status": "active"},
+  "pokemon-champions": {"display_name": "Pokémon Champions", "status": "active"},
+  "fate-grand-order": {"display_name": "Fate/Grand Order", "status": "active"},
+  "wuthering-waves": {"display_name": "鳴潮", "status": "active"},
+  "final-fantasy-iv": {"display_name": "FINAL FANTASY IV", "status": "active"},
+  "blue-archive": {"display_name": "ブルーアーカイブ", "status": "active"},
+  "identity-v": {"display_name": "Identity V 第五人格", "status": "active"},
+  "resident-evil-requiem": {"display_name": "バイオハザード レクイエム", "status": "active"},
+  "rhythm-heaven": {"display_name": "リズム天国", "status": "active"},
+  "pokemon-scarlet-violet": {"display_name": "ポケットモンスター スカーレット・バイオレット", "status": "active"},
+  "magic-the-gathering": {"display_name": "Magic: The Gathering", "status": "active"},
+  "sky-children-of-the-light": {"display_name": "Sky 星を紡ぐ子どもたち", "status": "active"}
 }
 
