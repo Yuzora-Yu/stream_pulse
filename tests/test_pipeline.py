@@ -6,6 +6,13 @@ from pathlib import Path
 
 from src.aggregate import aggregate_snapshot, aggregate_window, eligible
 from src.collector import YouTubeClient
+from src.dictionary_learning import (
+    dictionary_diagnostics,
+    empty_dictionary_state,
+    extract_hashtags,
+    learned_catalog,
+    update_dictionary_state,
+)
 from src.export_latest import export_latest, validate_public_summary
 from src.normalize import GameNormalizer, contains_alias, normalize_text
 from src.pipeline import PublicationGuardError, collection_diagnostics, make_summary, recent_raw_keys
@@ -80,6 +87,13 @@ class NormalizationTests(unittest.TestCase):
                 self.assertEqual(result.canonical_game_id, game_id)
                 self.assertEqual(result.review_status, "auto")
 
+    def test_catalog_and_aliases_stay_in_sync(self):
+        master = read_json("config/game_master.json")
+        aliases = read_json("config/aliases.json")
+        self.assertEqual(set(master), set(aliases))
+        self.assertGreaterEqual(len(master), 90)
+        self.assertGreaterEqual(sum(len(values) for values in aliases.values()), 300)
+
     def test_collection_diagnostics_prioritizes_high_viewer_unknowns(self):
         diagnostics = collection_diagnostics(
             [
@@ -153,7 +167,7 @@ class CollectorTests(unittest.TestCase):
                 "region_code": "JP",
                 "relevance_language": "ja",
                 "video_category_id": "20",
-                "search_query": "ゲーム|game|gaming|実況|配信",
+                "search_query": "ゲーム|実況|配信|生放送|ライブ",
                 "search_pages": 2,
                 "search_page_size": 50,
             }
@@ -161,10 +175,59 @@ class CollectorTests(unittest.TestCase):
 
         search_params = requests[0][1]
         self.assertEqual(search_params["part"], "snippet")
-        self.assertEqual(search_params["q"], "ゲーム|game|gaming|実況|配信")
+        self.assertEqual(search_params["q"], "ゲーム|実況|配信|生放送|ライブ")
         self.assertNotIn("videoCategoryId", search_params)
         self.assertNotIn("source_excluded_reason", records[0])
         self.assertEqual(records[1]["source_excluded_reason"], "video_category:10")
+
+
+class DictionaryLearningTests(unittest.TestCase):
+    def test_extracts_useful_hashtags_and_rejects_generic_tags(self):
+        self.assertEqual(
+            extract_hashtags("【配信】Apex #エペ部 #ゲーム実況 #新人VTuber #shortslive #steam"),
+            [("エペ部", "エペ部")],
+        )
+
+    def test_learns_alias_after_three_distinct_channels(self):
+        records = [
+            {
+                "observed_at": "2026-08-28T14:00:00Z",
+                "channel_id": f"channel-{index}",
+                "raw_title": "Apex Legends #エペ部",
+                "canonical_game_id": "apex-legends",
+                "review_status": "auto",
+            }
+            for index in range(3)
+        ]
+        state = update_dictionary_state(
+            empty_dictionary_state(),
+            records,
+            known_aliases={"apex legends", "apex"},
+        )
+        self.assertEqual(state["learned_aliases"], {"apex-legends": ["エペ部"]})
+        self.assertEqual(dictionary_diagnostics(state)["learned_aliases"], 1)
+
+    def test_learns_new_game_after_five_distinct_channels(self):
+        records = [
+            {
+                "observed_at": "2026-08-28T14:00:00Z",
+                "channel_id": f"channel-{index}",
+                "raw_title": "新作を遊ぶ #雪葬",
+                "canonical_game_id": None,
+                "review_status": "hold",
+            }
+            for index in range(5)
+        ]
+        state = update_dictionary_state(
+            empty_dictionary_state(),
+            records,
+            known_aliases=set(),
+        )
+        master, aliases = learned_catalog(state)
+        self.assertEqual(len(master), 1)
+        game_id = next(iter(master))
+        self.assertEqual(master[game_id]["display_name"], "雪葬")
+        self.assertEqual(aliases[game_id], ["雪葬"])
 
 
 class AggregationTests(unittest.TestCase):

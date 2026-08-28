@@ -56,6 +56,20 @@ class GameNormalizer:
         self.description_exclusions = [normalize_text(x) for x in exclusions.get("description_terms", [])]
         self.excluded_channels = set(exclusions.get("channel_ids", []))
 
+    def extend_catalog(
+        self,
+        game_master: dict[str, dict[str, Any]],
+        aliases: dict[str, list[str]],
+    ) -> None:
+        self.game_master.update(game_master)
+        for game_id, values in aliases.items():
+            combined = set(self.aliases.get(game_id, []))
+            combined.update(normalize_text(alias) for alias in values)
+            self.aliases[game_id] = sorted(combined, key=len, reverse=True)
+
+    def known_aliases(self) -> set[str]:
+        return {alias for values in self.aliases.values() for alias in values}
+
     def classify(self, record: dict[str, Any]) -> Classification:
         if record.get("source_excluded_reason"):
             return self._excluded(str(record["source_excluded_reason"]))

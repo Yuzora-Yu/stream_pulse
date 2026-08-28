@@ -4,9 +4,14 @@
   "relevance_language": "ja",
   "video_category_id": "20",
   "observation_interval_minutes": 30,
-  "search_query": "ゲーム|game|gaming|実況|配信",
+  "search_query": "ゲーム|実況|配信|生放送|ライブ",
   "search_pages": 2,
   "search_page_size": 50,
+  "dictionary_learning": {
+    "alias_min_channels": 3,
+    "game_min_channels": 5,
+    "candidate_limit": 2000
+  },
   "cutoff": {
     "min_subscribers": 1000,
     "min_concurrent_viewers": 30,

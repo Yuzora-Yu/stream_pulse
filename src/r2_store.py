@@ -69,6 +69,17 @@ class R2Store:
             body = gzip.decompress(body)
         return json.loads(body.decode("utf-8"))
 
+    def get_json_optional(self, key: str) -> Any | None:
+        try:
+            return self.get_json(key)
+        except Exception as exc:
+            response = getattr(exc, "response", {})
+            code = str(response.get("Error", {}).get("Code", ""))
+            status = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
+            if code in {"NoSuchKey", "404"} or status == 404:
+                return None
+            raise
+
     def list_keys(self, prefix: str, *, limit: int = 1000) -> list[str]:
         paginator = self.client.get_paginator("list_objects_v2")
         pages = paginator.paginate(

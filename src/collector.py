@@ -124,6 +124,7 @@ class YouTubeClient:
                     "category_id": snippet.get("categoryId"),
                     "raw_title": snippet.get("title", ""),
                     "description": snippet.get("description", ""),
+                    "tags": snippet.get("tags", []),
                     "published_at": snippet.get("publishedAt"),
                     "actual_start_time": live.get("actualStartTime"),
                     "scheduled_start_time": live.get("scheduledStartTime"),

@@ -11,6 +11,12 @@ from typing import Any, Protocol
 
 from .aggregate import aggregate_snapshot, aggregate_window
 from .collector import YouTubeClient
+from .dictionary_learning import (
+    dictionary_diagnostics,
+    empty_dictionary_state,
+    learned_catalog,
+    update_dictionary_state,
+)
 from .normalize import GameNormalizer
 from .r2_store import R2Store
 
@@ -169,6 +175,12 @@ def collect_and_publish(
     diagnostics_output: Path | None = None,
 ) -> dict[str, Any]:
     settings, normalizer = load_settings()
+    store = R2Store.from_env() if output is None else None
+    dictionary_state = empty_dictionary_state()
+    if store is not None and fixture is None:
+        dictionary_state = store.get_json_optional("dictionary/state.json") or dictionary_state
+        learned_master, learned_aliases = learned_catalog(dictionary_state)
+        normalizer.extend_catalog(learned_master, learned_aliases)
     if fixture:
         records = load_json(fixture)
     else:
@@ -177,6 +189,16 @@ def collect_and_publish(
             raise RuntimeError("YOUTUBE_API_KEY is required")
         records = YouTubeClient(api_key).collect(settings)
     normalized = normalize_records(records, normalizer)
+    if store is not None and fixture is None:
+        learning = settings.get("dictionary_learning", {})
+        dictionary_state = update_dictionary_state(
+            dictionary_state,
+            normalized,
+            known_aliases=normalizer.known_aliases(),
+            alias_min_channels=int(learning.get("alias_min_channels", 3)),
+            game_min_channels=int(learning.get("game_min_channels", 5)),
+            candidate_limit=int(learning.get("candidate_limit", 2000)),
+        )
     diagnostics = collection_diagnostics(normalized)
     if not fixture:
         diagnostics["discovery"] = {
@@ -186,6 +208,7 @@ def collect_and_publish(
             "requested_pages": int(settings.get("search_pages", 2)),
             "page_size": int(settings.get("search_page_size", 50)),
         }
+        diagnostics["dictionary"] = dictionary_diagnostics(dictionary_state)
     if diagnostics_output:
         write_json(diagnostics_output, diagnostics)
     if not diagnostics["classified_games"]:
@@ -201,11 +224,18 @@ def collect_and_publish(
         write_json(output, summary)
         return summary
 
-    store = R2Store.from_env()
+    if store is None:
+        raise RuntimeError("R2 store was not initialized for publication")
     collected_at = datetime.now(UTC)
     stamp = collected_at.strftime("%Y/%m/%d/%H%M")
     raw_key = f"{settings['raw_prefix']}/{stamp}.json.gz"
     store.put_gzip_json(raw_key, normalized)
+    if fixture is None:
+        store.put_json(
+            "dictionary/state.json",
+            dictionary_state,
+            cache_control="private, max-age=300",
+        )
 
     review_rows = [row for row in normalized if row.get("review_status") in {"hold", "conflict"}]
     if review_rows:

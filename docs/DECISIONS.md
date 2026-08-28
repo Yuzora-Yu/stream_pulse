@@ -40,6 +40,12 @@ Pages deployment uploads `dist/`, not the repository root. This keeps Python, te
 
 The production Pages build exports the validated last-good summary from private R2 and bundles it under `dist/data/latest.json`. A successful collection triggers a new Pages deployment. R2 credentials remain server-side in Actions, and the bucket does not require a public URL or browser CORS policy.
 
+## 2026-08-28: The classification dictionary learns with multi-channel evidence
+
+Status: accepted
+
+The checked-in catalog is a broad seed, not a closed list. Production observations retain title hashtags in private R2. A new hashtag co-occurring with a confidently classified game becomes a learned alias after three distinct channels agree. A hashtag from otherwise unclassified gaming streams becomes a learned game after five distinct channels agree. Single-channel terms remain review candidates, generic streaming tags are rejected, and all learned state is auditable in `dictionary/state.json`.
+
 ## Format compatibility
 
 The current public document uses `schema_version: 1`. Any future incompatible change requires an explicit reader/migration path. Unknown versions must not be silently rewritten or treated as version 1.
