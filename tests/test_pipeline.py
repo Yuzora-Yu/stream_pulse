@@ -5,7 +5,7 @@ from pathlib import Path
 
 from src.aggregate import aggregate_snapshot, aggregate_window, eligible
 from src.normalize import GameNormalizer, normalize_text
-from src.pipeline import PublicationGuardError, make_summary, recent_raw_keys
+from src.pipeline import PublicationGuardError, collection_diagnostics, make_summary, recent_raw_keys
 from src.r2_store import R2Store
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,6 +38,33 @@ class NormalizationTests(unittest.TestCase):
             {"raw_title": "雑談しながらマイクラ", "description": "", "channel_id": "x"}
         )
         self.assertEqual(result.review_status, "excluded")
+
+    def test_additional_japanese_game_alias(self):
+        result = self.normalizer.classify(
+            {"raw_title": "【原神】螺旋に挑戦", "description": "", "channel_id": "x"}
+        )
+        self.assertEqual(result.canonical_game_id, "genshin-impact")
+        self.assertEqual(result.review_status, "auto")
+
+    def test_collection_diagnostics_prioritizes_high_viewer_unknowns(self):
+        diagnostics = collection_diagnostics(
+            [
+                {
+                    "observed_at": "2026-08-28T12:00:00Z",
+                    "raw_title": "unknown low",
+                    "review_status": "hold",
+                    "concurrent_viewers": 10,
+                },
+                {
+                    "observed_at": "2026-08-28T12:00:00Z",
+                    "raw_title": "unknown high",
+                    "review_status": "hold",
+                    "concurrent_viewers": 1000,
+                },
+            ]
+        )
+        self.assertEqual(diagnostics["status_counts"], {"hold": 2})
+        self.assertEqual(diagnostics["unpublished_samples"][0]["raw_title"], "unknown high")
 
 
 class AggregationTests(unittest.TestCase):

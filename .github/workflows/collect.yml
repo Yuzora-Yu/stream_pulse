@@ -31,16 +31,32 @@ jobs:
       - run: pip install -r requirements.txt
       - run: python -m unittest discover -s tests -p "test_*.py"
       - name: Collect, aggregate, and publish last-good JSON
+        id: collect_publish
         if: ${{ env.R2_ACCOUNT_ID != '' && env.R2_ACCESS_KEY_ID != '' && env.R2_SECRET_ACCESS_KEY != '' && env.R2_BUCKET != '' }}
-        run: python -m src.pipeline
+        continue-on-error: true
+        run: python -m src.pipeline --diagnostics-output runtime/collection-diagnostics.json
       - name: Validate the live YouTube sensor before R2 is configured
+        id: collect_probe
         if: ${{ env.R2_ACCOUNT_ID == '' || env.R2_ACCESS_KEY_ID == '' || env.R2_SECRET_ACCESS_KEY == '' || env.R2_BUCKET == '' }}
-        run: python -m src.pipeline --output runtime/live-probe.json
+        continue-on-error: true
+        run: python -m src.pipeline --output runtime/live-probe.json --diagnostics-output runtime/collection-diagnostics.json
+      - name: Retain classification diagnostics
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: stream-pulse-collection-diagnostics
+          path: runtime/collection-diagnostics.json
+          if-no-files-found: warn
+          retention-days: 7
       - name: Retain the live sensor probe
-        if: ${{ env.R2_ACCOUNT_ID == '' || env.R2_ACCESS_KEY_ID == '' || env.R2_SECRET_ACCESS_KEY == '' || env.R2_BUCKET == '' }}
+        if: ${{ always() && (env.R2_ACCOUNT_ID == '' || env.R2_ACCESS_KEY_ID == '' || env.R2_SECRET_ACCESS_KEY == '' || env.R2_BUCKET == '') }}
         uses: actions/upload-artifact@v4
         with:
           name: stream-pulse-live-probe
           path: runtime/live-probe.json
+          if-no-files-found: warn
           retention-days: 7
+      - name: Propagate collection failure
+        if: ${{ steps.collect_publish.outcome == 'failure' || steps.collect_probe.outcome == 'failure' }}
+        run: exit 1
 

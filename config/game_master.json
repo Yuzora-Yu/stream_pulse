@@ -6,6 +6,14 @@
   "monster-hunter-wilds": {"display_name": "Monster Hunter Wilds", "status": "active"},
   "street-fighter-6": {"display_name": "Street Fighter 6", "status": "active"},
   "splatoon-3": {"display_name": "スプラトゥーン3", "status": "active"},
-  "league-of-legends": {"display_name": "League of Legends", "status": "active"}
+  "league-of-legends": {"display_name": "League of Legends", "status": "active"},
+  "genshin-impact": {"display_name": "原神", "status": "active"},
+  "honkai-star-rail": {"display_name": "崩壊：スターレイル", "status": "active"},
+  "zenless-zone-zero": {"display_name": "ゼンレスゾーンゼロ", "status": "active"},
+  "umamusume": {"display_name": "ウマ娘 プリティーダービー", "status": "active"},
+  "final-fantasy-xiv": {"display_name": "FINAL FANTASY XIV", "status": "active"},
+  "mahjong-soul": {"display_name": "雀魂", "status": "active"},
+  "dragon-quest-x": {"display_name": "ドラゴンクエストX", "status": "active"},
+  "mario-kart-world": {"display_name": "マリオカート ワールド", "status": "active"}
 }
 

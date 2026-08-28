@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import re
+from collections import Counter
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, Protocol
@@ -41,6 +42,48 @@ def load_settings() -> tuple[dict[str, Any], GameNormalizer]:
 
 def normalize_records(records: list[dict[str, Any]], normalizer: GameNormalizer) -> list[dict[str, Any]]:
     return [normalizer.normalize_record(record) for record in records]
+
+
+def collection_diagnostics(records: list[dict[str, Any]], *, sample_limit: int = 100) -> dict[str, Any]:
+    """Create a safe, deterministic report for tuning aliases without exposing API credentials."""
+    statuses = Counter(str(row.get("review_status") or "missing") for row in records)
+    games = Counter(str(row["canonical_game_id"]) for row in records if row.get("canonical_game_id"))
+    candidates = [row for row in records if row.get("review_status") != "auto"]
+    candidates.sort(
+        key=lambda row: (
+            -int(row.get("concurrent_viewers") or 0),
+            str(row.get("raw_title") or ""),
+            str(row.get("video_id") or ""),
+        )
+    )
+    samples = [
+        {
+            "raw_title": row.get("raw_title", ""),
+            "channel_title": row.get("channel_title", ""),
+            "concurrent_viewers": row.get("concurrent_viewers"),
+            "subscriber_count": row.get("subscriber_count"),
+            "review_status": row.get("review_status"),
+            "canonical_game_id": row.get("canonical_game_id"),
+            "evidence": row.get("evidence", []),
+            "excluded_reason": row.get("excluded_reason"),
+        }
+        for row in candidates[:sample_limit]
+    ]
+    return {
+        "observed_at": max(
+            (row["observed_at"] for row in records if row.get("observed_at")),
+            default=None,
+        ),
+        "record_count": len(records),
+        "status_counts": dict(sorted(statuses.items())),
+        "classified_games": dict(sorted(games.items())),
+        "unpublished_samples": samples,
+    }
+
+
+def write_json(path: Path, value: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def make_summary(
@@ -112,7 +155,12 @@ def recent_raw_keys(
     return [key for _, key in sorted(selected)]
 
 
-def collect_and_publish(*, fixture: Path | None = None, output: Path | None = None) -> dict[str, Any]:
+def collect_and_publish(
+    *,
+    fixture: Path | None = None,
+    output: Path | None = None,
+    diagnostics_output: Path | None = None,
+) -> dict[str, Any]:
     settings, normalizer = load_settings()
     if fixture:
         records = load_json(fixture)
@@ -122,11 +170,20 @@ def collect_and_publish(*, fixture: Path | None = None, output: Path | None = No
             raise RuntimeError("YOUTUBE_API_KEY is required")
         records = YouTubeClient(api_key).collect(settings)
     normalized = normalize_records(records, normalizer)
+    diagnostics = collection_diagnostics(normalized)
+    if diagnostics_output:
+        write_json(diagnostics_output, diagnostics)
+    if not diagnostics["classified_games"]:
+        print(
+            json.dumps(
+                {**diagnostics, "unpublished_samples": diagnostics["unpublished_samples"][:20]},
+                ensure_ascii=False,
+            )
+        )
 
     if output:
         summary = make_summary([normalized], settings, status="fixture" if fixture else "probe")
-        output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+        write_json(output, summary)
         return summary
 
     store = R2Store.from_env()
@@ -174,8 +231,17 @@ def main() -> None:
         help="Read raw YouTube-like records instead of calling the API",
     )
     parser.add_argument("--output", type=Path, help="Write summary locally instead of R2")
+    parser.add_argument(
+        "--diagnostics-output",
+        type=Path,
+        help="Write classification diagnostics even when publication is blocked",
+    )
     args = parser.parse_args()
-    summary = collect_and_publish(fixture=args.fixture, output=args.output)
+    summary = collect_and_publish(
+        fixture=args.fixture,
+        output=args.output,
+        diagnostics_output=args.diagnostics_output,
+    )
     print(json.dumps({"status": "ok", "observed_at": summary["meta"]["observed_at"]}, ensure_ascii=False))
 
 

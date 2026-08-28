@@ -18,6 +18,8 @@ Status: accepted
 
 Until R2 credentials exist, the scheduled workflow performs one real YouTube collection and retains the single-snapshot result as a short-lived GitHub Actions artifact. It is labeled `probe`, is not presented as 24-hour production data, and does not replace the public demo. Once all R2 settings exist, the same workflow switches to raw persistence and last-good publication.
 
+Classification diagnostics are retained as a separate short-lived artifact on every run, including blocked publications. The report contains public stream metadata needed to tune aliases, but never credentials or environment values.
+
 ## 2026-08-28: Public data source is injected at build time
 
 Status: accepted
