@@ -1,0 +1,16 @@
+{
+  "name": "yuzora-stream-pulse",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests-js/*.test.mjs && python -m unittest discover -s tests -p \"test_*.py\" && npm run build",
+    "preview": "node scripts/preview.mjs"
+  },
+  "engines": {
+    "node": ">=20",
+    "python": ">=3.11"
+  }
+}
+

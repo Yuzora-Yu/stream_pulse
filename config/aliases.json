@@ -1,0 +1,11 @@
+{
+  "minecraft": ["minecraft", "マイクラ", "マインクラフト", "minecraft java"],
+  "valorant": ["valorant", "valo", "ヴァロラント"],
+  "apex-legends": ["apex legends", "apex", "エーペックス"],
+  "fortnite": ["fortnite", "フォートナイト"],
+  "monster-hunter-wilds": ["monster hunter wilds", "mhwilds", "モンハンワイルズ", "モンスターハンターワイルズ"],
+  "street-fighter-6": ["street fighter 6", "sf6", "スト6", "ストリートファイター6"],
+  "splatoon-3": ["splatoon 3", "splatoon3", "スプラ3", "スプラトゥーン3"],
+  "league-of-legends": ["league of legends", "lol", "リーグ・オブ・レジェンド"]
+}
+

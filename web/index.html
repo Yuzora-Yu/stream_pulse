@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07111f">
+  <meta name="description" content="YouTubeゲーム配信の配信者数と視聴量を30分ごとに観測し、いまの勢いと24時間の流れを見える化します。">
+  <title>STREAM PULSE | YU-ZORA</title>
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body data-source="./data/latest.json">
+  <a class="skip-link" href="#main">ランキングへ移動</a>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="YU-ZORAトップへ">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>YU-ZORA</span><small>STREAM PULSE</small>
+    </a>
+    <nav aria-label="補助ナビゲーション">
+      <a href="../Tool05_stream_pulse/">このツールについて</a>
+      <a href="./methodology/">測定方法</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">YOUTUBE GAMING / 30 MIN OBSERVATION</p>
+        <h1 id="page-title">いま、何が配信され、<br><em>どれだけ見られているか。</em></h1>
+        <p class="hero-copy">ゲーム配信の「供給」と「需要」を分けて観測。単発の人気順ではなく、時間とともに変わる配信の鼓動を記録します。</p>
+      </div>
+      <aside class="pulse-status" aria-label="観測ステータス">
+        <div class="status-head"><span>OBSERVATION STATUS</span><strong id="status-label">読込中</strong></div>
+        <dl>
+          <div><dt>観測時刻</dt><dd id="observed-at">—</dd></div>
+          <div><dt>最終成功</dt><dd id="last-success-at">—</dd></div>
+          <div><dt>対象</dt><dd>YouTube Gaming / JP</dd></div>
+          <div><dt>間隔</dt><dd id="interval">30分</dd></div>
+        </dl>
+        <p id="status-note">最新データを確認しています。</p>
+      </aside>
+    </section>
+
+    <section class="metric-section" aria-labelledby="now-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">CURRENT SNAPSHOT</p><h2 id="now-title">配信のいま</h2></div>
+        <p>配信本数ではなく、同一チャンネル × ゲームを1人として集計します。</p>
+      </div>
+      <div class="metric-grid">
+        <article class="metric-card is-cyan"><span>LIVE STREAMERS</span><strong id="metric-streamers">—</strong><p>現在のユニーク配信者</p></article>
+        <article class="metric-card is-violet"><span>CURRENT VIEWERS</span><strong id="metric-viewers">—</strong><p>対象ライブの同時視聴者合計</p></article>
+        <article class="metric-card is-amber"><span>VIEWERS / STREAMER</span><strong id="metric-density">—</strong><p>配信者1人あたりの平均視聴者</p></article>
+        <article class="metric-card is-mint"><span>24H VIEWER HOURS</span><strong id="metric-hours">—</strong><p>30分観測から推定した視聴時間</p></article>
+      </div>
+    </section>
+
+    <section class="chart-section" aria-labelledby="flow-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">24 HOUR FLOW</p><h2 id="flow-title">供給と需要の流れ</h2></div>
+        <div class="legend" aria-label="グラフ凡例"><span class="legend-streamers">配信者数</span><span class="legend-viewers">視聴者数</span></div>
+      </div>
+      <div class="chart-panel">
+        <canvas id="trend-chart" width="1200" height="420" role="img" aria-label="過去24時間の配信者数と視聴者数の推移"></canvas>
+        <p id="chart-empty" class="empty-note" hidden>推移を表示できる観測履歴がまだありません。</p>
+      </div>
+      <div class="peak-grid" id="peak-grid"></div>
+    </section>
+
+    <section class="ranking-section" aria-labelledby="ranking-title">
+      <div class="section-heading ranking-heading">
+        <div><p class="eyebrow">GAME RANKINGS</p><h2 id="ranking-title">ゲーム別ランキング</h2></div>
+        <p>配信者が多いゲームと、視聴が集まるゲームを同じ数字として混ぜません。</p>
+      </div>
+      <div class="ranking-controls">
+        <div class="segmented" role="group" aria-label="ランキング期間">
+          <button type="button" class="is-active" data-period="live" aria-pressed="true">LIVE</button>
+          <button type="button" data-period="last_24h" aria-pressed="false">24 HOURS</button>
+        </div>
+        <label class="search-control"><span>ゲーム検索</span><input id="game-search" type="search" placeholder="ゲーム名を入力"></label>
+        <label class="sort-control"><span>並び順</span><select id="sort-select"><option value="streamers">配信者数</option><option value="viewers">視聴者数</option><option value="density">視聴者密度</option></select></label>
+      </div>
+      <div class="ranking-panel">
+        <div class="ranking-head" aria-hidden="true"><span>RANK / GAME</span><span id="column-a-label">配信者</span><span id="column-b-label">視聴者</span><span id="column-c-label">密度</span></div>
+        <ol class="ranking-list" id="ranking-list"></ol>
+        <p id="ranking-empty" class="empty-note" hidden>条件に合うゲームがありません。</p>
+      </div>
+    </section>
+
+    <section class="method-strip" aria-label="測定条件">
+      <div><span>SOURCE</span><strong>YouTube Data API</strong></div>
+      <div><span>CUTOFF</span><strong id="cutoff-label">登録者1,000以上 OR 同接30以上</strong></div>
+      <div><span>SCOPE</span><strong>上位ライブ候補 / 日本向け</strong></div>
+      <div><span>NOTE</span><strong>全配信を網羅する統計ではありません</strong></div>
+      <a href="./methodology/">測定方法と制約を読む →</a>
+    </section>
+  </main>
+
+  <footer>
+    <div><strong>YU-ZORA / STREAM PULSE</strong><p>ゲーム配信の「いま」と「積み重なり」を観測するWebツール。</p></div>
+    <nav aria-label="フッターナビゲーション"><a href="/tools/">TOOLS</a><a href="/privacy/">PRIVACY</a><a href="/contact/">CONTACT</a></nav>
+  </footer>
+  <script type="module" src="./assets/app.js"></script>
+</body>
+</html>
+

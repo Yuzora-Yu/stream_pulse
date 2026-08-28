@@ -1,0 +1,7 @@
+[
+  {"observed_at":"2026-08-28T09:00:00Z","video_id":"v1","channel_id":"c1","channel_title":"Alpha","raw_title":"【マイクラ】建築する","description":"Minecraft","concurrent_viewers":120,"view_count":1000,"subscriber_count":5000,"hidden_subscriber_count":false},
+  {"observed_at":"2026-08-28T09:00:00Z","video_id":"v2","channel_id":"c1","channel_title":"Alpha","raw_title":"VALORANT 朝活","description":"","concurrent_viewers":80,"view_count":500,"subscriber_count":5000,"hidden_subscriber_count":false},
+  {"observed_at":"2026-08-28T09:00:00Z","video_id":"v3","channel_id":"c2","channel_title":"Beta","raw_title":"モンハンワイルズ 初見","description":"","concurrent_viewers":42,"view_count":300,"subscriber_count":null,"hidden_subscriber_count":true},
+  {"observed_at":"2026-08-28T09:00:00Z","video_id":"v4","channel_id":"c3","channel_title":"Gamma","raw_title":"雑談とMinecraft","description":"","concurrent_viewers":900,"view_count":9000,"subscriber_count":90000,"hidden_subscriber_count":false}
+]
+

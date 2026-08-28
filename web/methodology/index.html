@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07111f">
+  <meta name="description" content="STREAM PULSEの観測対象、指標、足切り条件、制約とデータ品質方針。">
+  <title>測定方法 | STREAM PULSE</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body class="methodology-page">
+  <header class="site-header"><a class="brand" href="../"><span class="brand-mark" aria-hidden="true"></span><span>YU-ZORA</span><small>STREAM PULSE</small></a><nav><a href="../">ランキングへ戻る</a></nav></header>
+  <main class="prose-shell">
+    <p class="eyebrow">METHODOLOGY / VERSION 1</p>
+    <h1>測定方法と制約</h1>
+    <p class="lead">STREAM PULSEは「ゲームそのものの総合人気」ではなく、YouTube上のゲームライブ配信活動と視聴活動を観測します。</p>
+    <section><h2>観測対象</h2><p>YouTube Data APIのライブ検索から、日本で視聴可能なGamingカテゴリの上位候補を30分ごとに取得します。初期版は検索上位100件を母集団とするため、全ライブ配信を網羅する統計ではありません。</p></section>
+    <section><h2>主要指標</h2><dl class="definition-list"><div><dt>LIVE配信者数</dt><dd>同一スナップショット内の <code>channel_id × canonical_game_id</code> の重複を除いた数。</dd></div><div><dt>現在視聴者数</dt><dd>対象ライブの <code>concurrentViewers</code> 合計。</dd></div><div><dt>24hユニーク配信者数</dt><dd>過去24時間に同じゲームを何度配信しても、同一チャンネルは1人として集計。</dd></div><div><dt>推定Viewer Hours</dt><dd>各30分観測の同時視聴者数 × 0.5時間を積算した推定値。</dd></div><div><dt>視聴者密度</dt><dd>現在視聴者数 ÷ LIVE配信者数。配信供給と視聴需要のバランスを見る補助指標。</dd></div></dl></section>
+    <section><h2>足切り条件</h2><p>初期値は「登録者数1,000以上」または「現在同接30以上」です。登録者数が非公開の場合は0人とみなさず、同接条件のみで判定します。条件は運用台帳から変更でき、過去スナップショットは残します。</p></section>
+    <section><h2>ゲーム名の正規化</h2><p>動画タイトル・説明・既知の別名から正規ゲームIDへ統合します。未知・曖昧・競合は未分類キューへ送り、確信できない値をランキングへ混ぜません。雑談、歌、同時視聴などの除外候補も別ルールで監査します。</p></section>
+    <section><h2>障害時の表示</h2><p>API障害やクォータ枯渇時に空ランキングを公開しません。最後に完全成功したデータを維持し、画面上に最終成功時刻と状態を表示します。</p></section>
+    <section><h2>意図的に測らないもの</h2><ul><li>Steam、Twitch、TikTokなどを含む総合ゲーム人気</li><li>YouTubeの非公開Analyticsや非公開登録者数</li><li>配信の面白さ・質などの主観評価</li><li>YouTubeが公開していない「ユニーク視聴者数」</li></ul></section>
+  </main>
+  <footer><div><strong>YU-ZORA / STREAM PULSE</strong></div><nav><a href="../">ランキングへ戻る</a><a href="/tools/">TOOLS</a></nav></footer>
+</body>
+</html>
+

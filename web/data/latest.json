@@ -1,0 +1,63 @@
+{
+  "meta": {
+    "schema_version": 1,
+    "status": "demo",
+    "observed_at": "2026-08-28T09:00:00Z",
+    "last_success_at": "2026-08-28T09:00:00Z",
+    "observation_interval_minutes": 30,
+    "source": "UI preview fixture",
+    "scope": "YouTube Gaming / regionCode=JP / 上位ライブ候補",
+    "cutoff": {"min_subscribers": 1000, "min_concurrent_viewers": 30, "operator": "OR"},
+    "review_queue_count": 3,
+    "methodology_url": "./methodology/"
+  },
+  "totals": {
+    "live_streamers": 174,
+    "current_viewers": 68240,
+    "viewer_density": 392.2,
+    "unique_streamers_24h": 1264,
+    "viewer_hours_24h": 913482.5
+  },
+  "rankings": {
+    "live": [
+      {"game_id":"minecraft","display_name":"Minecraft","live_streamers":38,"current_viewers":9210,"viewer_density":242.4},
+      {"game_id":"valorant","display_name":"VALORANT","live_streamers":31,"current_viewers":14820,"viewer_density":478.1},
+      {"game_id":"apex-legends","display_name":"Apex Legends","live_streamers":27,"current_viewers":11460,"viewer_density":424.4},
+      {"game_id":"monster-hunter-wilds","display_name":"Monster Hunter Wilds","live_streamers":23,"current_viewers":17140,"viewer_density":745.2},
+      {"game_id":"fortnite","display_name":"Fortnite","live_streamers":19,"current_viewers":4860,"viewer_density":255.8},
+      {"game_id":"street-fighter-6","display_name":"Street Fighter 6","live_streamers":15,"current_viewers":5980,"viewer_density":398.7},
+      {"game_id":"splatoon-3","display_name":"スプラトゥーン3","live_streamers":12,"current_viewers":2910,"viewer_density":242.5},
+      {"game_id":"league-of-legends","display_name":"League of Legends","live_streamers":9,"current_viewers":1860,"viewer_density":206.7}
+    ],
+    "last_24h": [
+      {"game_id":"minecraft","display_name":"Minecraft","unique_streamers":282,"viewer_hours":144620.5,"view_delta":381240},
+      {"game_id":"valorant","display_name":"VALORANT","unique_streamers":251,"viewer_hours":192840.0,"view_delta":504880},
+      {"game_id":"apex-legends","display_name":"Apex Legends","unique_streamers":207,"viewer_hours":158340.5,"view_delta":424410},
+      {"game_id":"monster-hunter-wilds","display_name":"Monster Hunter Wilds","unique_streamers":168,"viewer_hours":218920.0,"view_delta":618700},
+      {"game_id":"fortnite","display_name":"Fortnite","unique_streamers":139,"viewer_hours":70122.0,"view_delta":184450},
+      {"game_id":"street-fighter-6","display_name":"Street Fighter 6","unique_streamers":96,"viewer_hours":67450.0,"view_delta":165330},
+      {"game_id":"splatoon-3","display_name":"スプラトゥーン3","unique_streamers":72,"viewer_hours":40190.0,"view_delta":104820},
+      {"game_id":"league-of-legends","display_name":"League of Legends","unique_streamers":49,"viewer_hours":21000.0,"view_delta":58020}
+    ]
+  },
+  "peaks": {
+    "live_streamers": {"at":"2026-08-28T04:00:00Z","value":218},
+    "current_viewers": {"at":"2026-08-28T07:00:00Z","value":91840},
+    "viewer_density": {"at":"2026-08-28T07:00:00Z","value":489.6}
+  },
+  "timeseries": [
+    {"at":"2026-08-27T10:00:00Z","live_streamers":126,"current_viewers":38420,"viewer_density":304.9},
+    {"at":"2026-08-27T12:00:00Z","live_streamers":148,"current_viewers":46180,"viewer_density":312.0},
+    {"at":"2026-08-27T14:00:00Z","live_streamers":172,"current_viewers":59820,"viewer_density":347.8},
+    {"at":"2026-08-27T16:00:00Z","live_streamers":194,"current_viewers":74260,"viewer_density":382.8},
+    {"at":"2026-08-27T18:00:00Z","live_streamers":207,"current_viewers":86110,"viewer_density":416.0},
+    {"at":"2026-08-27T20:00:00Z","live_streamers":201,"current_viewers":82420,"viewer_density":410.0},
+    {"at":"2026-08-27T22:00:00Z","live_streamers":183,"current_viewers":70130,"viewer_density":383.2},
+    {"at":"2026-08-28T00:00:00Z","live_streamers":196,"current_viewers":78240,"viewer_density":399.2},
+    {"at":"2026-08-28T02:00:00Z","live_streamers":209,"current_viewers":87820,"viewer_density":420.2},
+    {"at":"2026-08-28T04:00:00Z","live_streamers":218,"current_viewers":89630,"viewer_density":411.1},
+    {"at":"2026-08-28T07:00:00Z","live_streamers":188,"current_viewers":91840,"viewer_density":488.5},
+    {"at":"2026-08-28T09:00:00Z","live_streamers":174,"current_viewers":68240,"viewer_density":392.2}
+  ]
+}
+

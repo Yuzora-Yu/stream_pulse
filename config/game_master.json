@@ -1,0 +1,11 @@
+{
+  "minecraft": {"display_name": "Minecraft", "status": "active"},
+  "valorant": {"display_name": "VALORANT", "status": "active"},
+  "apex-legends": {"display_name": "Apex Legends", "status": "active"},
+  "fortnite": {"display_name": "Fortnite", "status": "active"},
+  "monster-hunter-wilds": {"display_name": "Monster Hunter Wilds", "status": "active"},
+  "street-fighter-6": {"display_name": "Street Fighter 6", "status": "active"},
+  "splatoon-3": {"display_name": "スプラトゥーン3", "status": "active"},
+  "league-of-legends": {"display_name": "League of Legends", "status": "active"}
+}
+

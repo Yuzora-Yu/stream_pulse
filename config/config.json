@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "region_code": "JP",
+  "relevance_language": "ja",
+  "video_category_id": "20",
+  "observation_interval_minutes": 30,
+  "search_pages": 2,
+  "search_page_size": 50,
+  "cutoff": {
+    "min_subscribers": 1000,
+    "min_concurrent_viewers": 30,
+    "operator": "OR"
+  },
+  "retention_days": 90,
+  "public_prefix": "summary",
+  "raw_prefix": "raw",
+  "hourly_prefix": "hourly",
+  "daily_prefix": "daily"
+}
+
