@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import gzip
-import io
 import json
 import os
 from dataclasses import dataclass
@@ -16,7 +15,7 @@ class R2Store:
     secret_access_key: str
 
     @classmethod
-    def from_env(cls) -> "R2Store":
+    def from_env(cls) -> R2Store:
         required = {
             "bucket": os.environ.get("R2_BUCKET"),
             "account_id": os.environ.get("R2_ACCOUNT_ID"),
@@ -71,8 +70,14 @@ class R2Store:
         return json.loads(body.decode("utf-8"))
 
     def list_keys(self, prefix: str, *, limit: int = 1000) -> list[str]:
-        response = self.client.list_objects_v2(Bucket=self.bucket, Prefix=prefix, MaxKeys=min(limit, 1000))
-        return sorted(item["Key"] for item in response.get("Contents", []))
+        paginator = self.client.get_paginator("list_objects_v2")
+        pages = paginator.paginate(
+            Bucket=self.bucket,
+            Prefix=prefix,
+            PaginationConfig={"PageSize": min(max(limit, 1), 1000)},
+        )
+        keys = [item["Key"] for page in pages for item in page.get("Contents", [])]
+        return sorted(keys)[-limit:]
 
 
 def public_cors_policy(origin: str = "https://yu-zora.com") -> list[dict[str, Any]]:

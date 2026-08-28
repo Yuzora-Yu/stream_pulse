@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Iterable
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Any, Iterable
+from datetime import UTC, datetime
+from typing import Any
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
-
 
 YOUTUBE_API_BASE = "https://www.googleapis.com/youtube/v3"
 
@@ -104,7 +104,7 @@ class YouTubeClient:
             )
             channels.update({item["id"]: item for item in payload.get("items", [])})
 
-        observed_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+        observed_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
         records: list[dict[str, Any]] = []
         for video in videos:
             snippet = video.get("snippet", {})

@@ -20,12 +20,13 @@ export function formatHour(value) {
 }
 
 export function rankingSortKey(period, sort) {
-  if (period === "last_24h") return sort === "viewers" ? "viewer_hours" : sort === "density" ? "viewer_hours" : "unique_streamers";
+  if (period === "last_24h") return sort === "viewers" ? "viewer_hours" : sort === "density" ? "view_delta" : "unique_streamers";
   return sort === "viewers" ? "current_viewers" : sort === "density" ? "viewer_density" : "live_streamers";
 }
 
 export function statusPresentation(status) {
   if (status === "live") return { label: "LIVE", className: "is-live", note: "観測パイプラインは正常です。" };
+  if (status === "probe") return { label: "LIVE PROBE", className: "is-live", note: "実測センサーの単発確認データです。履歴公開はまだ開始していません。" };
   if (status === "stale") return { label: "LAST GOOD", className: "is-stale", note: "更新に失敗したため、最後に成功したデータを表示しています。" };
   if (status === "demo" || status === "fixture") return { label: "DEMO DATA", className: "is-demo", note: "これは画面確認用データです。実測ランキングではありません。" };
   return { label: "CHECK", className: "is-error", note: "観測状態を確認できません。" };

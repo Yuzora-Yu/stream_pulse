@@ -6,9 +6,17 @@ import os
 from pathlib import Path
 from typing import Any
 
-
 ROOT = Path(__file__).resolve().parents[1]
-SHEETS = ["config", "game_master", "aliases", "review_queue", "audit_log", "daily_game_stats", "daily_hour_stats", "system_status"]
+SHEETS = [
+    "config",
+    "game_master",
+    "aliases",
+    "review_queue",
+    "audit_log",
+    "daily_game_stats",
+    "daily_hour_stats",
+    "system_status",
+]
 
 
 def _service():
@@ -41,7 +49,12 @@ def write_values(sheet_id: str, range_name: str, values: list[list[Any]]) -> Non
 
 
 def verify_tabs(sheet_id: str) -> list[str]:
-    metadata = _service().spreadsheets().get(spreadsheetId=sheet_id, fields="sheets.properties.title").execute()
+    metadata = (
+        _service()
+        .spreadsheets()
+        .get(spreadsheetId=sheet_id, fields="sheets.properties.title")
+        .execute()
+    )
     existing = {item["properties"]["title"] for item in metadata.get("sheets", [])}
     return [name for name in SHEETS if name not in existing]
 

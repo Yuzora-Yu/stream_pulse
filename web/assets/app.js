@@ -82,6 +82,8 @@ function renderRanking() {
   $("#column-a-label").textContent = isLive ? "配信者" : "24h配信者";
   $("#column-b-label").textContent = isLive ? "視聴者" : "Viewer Hours";
   $("#column-c-label").textContent = isLive ? "密度" : "再生増分";
+  const thirdSort = $("#sort-select option[value='density']");
+  thirdSort.textContent = isLive ? "視聴者密度" : "再生増分";
   const list = $("#ranking-list");
   const rows = rankingRows();
   list.replaceChildren(...rows.map((item, index) => rankingItem(item, index, isLive)));

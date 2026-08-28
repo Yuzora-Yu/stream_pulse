@@ -12,10 +12,12 @@ test("ranking keys change with period", () => {
   assert.equal(rankingSortKey("live", "streamers"), "live_streamers");
   assert.equal(rankingSortKey("live", "viewers"), "current_viewers");
   assert.equal(rankingSortKey("last_24h", "viewers"), "viewer_hours");
+  assert.equal(rankingSortKey("last_24h", "density"), "view_delta");
 });
 
 test("demo is explicitly disclosed", () => {
   assert.equal(statusPresentation("demo").label, "DEMO DATA");
   assert.match(statusPresentation("stale").note, /最後に成功/);
+  assert.equal(statusPresentation("probe").label, "LIVE PROBE");
 });
 

@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "node --test tests-js/*.test.mjs && python -m unittest discover -s tests -p \"test_*.py\" && npm run build",
+    "typecheck": "python -m mypy src tests",
+    "test": "node --test tests-js/*.test.mjs && python -m unittest discover -s tests -p \"test_*.py\"",
+    "lint": "python -m ruff check src tests && node --check web/assets/app.js && node --check web/assets/format.js && node --check scripts/build.mjs && node --check scripts/preview.mjs",
     "preview": "node scripts/preview.mjs"
   },
   "engines": {

@@ -3,17 +3,26 @@ from __future__ import annotations
 import argparse
 import json
 import os
-from datetime import datetime, timezone
+import re
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 from .aggregate import aggregate_snapshot, aggregate_window
 from .collector import YouTubeClient
 from .normalize import GameNormalizer
 from .r2_store import R2Store
 
-
 ROOT = Path(__file__).resolve().parents[1]
+RAW_KEY_TIME = re.compile(r"/(\d{4})/(\d{2})/(\d{2})/(\d{4})\.json\.gz$")
+
+
+class PublicationGuardError(RuntimeError):
+    """Raised before latest.json can be replaced with an unusable ranking."""
+
+
+class RawKeyStore(Protocol):
+    def list_keys(self, prefix: str, *, limit: int = 1000) -> list[str]: ...
 
 
 def load_json(path: Path) -> Any:
@@ -37,14 +46,18 @@ def normalize_records(records: list[dict[str, Any]], normalizer: GameNormalizer)
 def make_summary(
     snapshots: list[list[dict[str, Any]]], settings: dict[str, Any], *, status: str = "live"
 ) -> dict[str, Any]:
+    if not snapshots:
+        raise PublicationGuardError("No snapshots are available for publication")
     current = aggregate_snapshot(snapshots[-1], settings["cutoff"])
+    if not current["games"]:
+        raise PublicationGuardError(
+            "Current observation produced no publishable games; last-good data was preserved"
+        )
     window = aggregate_window(
         snapshots,
         settings["cutoff"],
         interval_minutes=int(settings.get("observation_interval_minutes", 30)),
     )
-    unique_streamers = sum(game["unique_streamers"] for game in window["games"])
-    viewer_hours = round(sum(game["viewer_hours"] for game in window["games"]), 1)
     review_count = sum(1 for row in snapshots[-1] if row.get("review_status") in {"hold", "conflict"})
     return {
         "meta": {
@@ -57,17 +70,46 @@ def make_summary(
             "scope": "YouTube Gaming / regionCode=JP / 上位ライブ候補",
             "cutoff": settings["cutoff"],
             "review_queue_count": review_count,
+            "observed_streams": current["observed_streams"],
+            "eligible_streams": current["eligible_streams"],
             "methodology_url": "../methodology/",
         },
         "totals": {
             **current["totals"],
-            "unique_streamers_24h": unique_streamers,
-            "viewer_hours_24h": viewer_hours,
+            "unique_streamers_24h": window["totals"]["unique_streamers"],
+            "viewer_hours_24h": window["totals"]["viewer_hours"],
         },
         "rankings": {"live": current["games"], "last_24h": window["games"]},
         "peaks": window["peaks"],
         "timeseries": window["timeseries"],
     }
+
+
+def recent_raw_keys(
+    store: RawKeyStore,
+    raw_prefix: str,
+    *,
+    now: datetime,
+    hours: int = 24,
+) -> list[str]:
+    """List raw snapshot keys inside a real time window without scanning all retention history."""
+    now = now.astimezone(UTC)
+    cutoff = now - timedelta(hours=hours)
+    days = {now.date(), cutoff.date()}
+    keys: set[str] = set()
+    for day in sorted(days):
+        prefix = f"{raw_prefix}/{day.strftime('%Y/%m/%d')}/"
+        keys.update(store.list_keys(prefix, limit=96))
+
+    selected: list[tuple[datetime, str]] = []
+    for key in keys:
+        match = RAW_KEY_TIME.search(key)
+        if not match:
+            continue
+        stamp = datetime.strptime("".join(match.groups()), "%Y%m%d%H%M").replace(tzinfo=UTC)
+        if cutoff <= stamp <= now:
+            selected.append((stamp, key))
+    return [key for _, key in sorted(selected)]
 
 
 def collect_and_publish(*, fixture: Path | None = None, output: Path | None = None) -> dict[str, Any]:
@@ -82,23 +124,32 @@ def collect_and_publish(*, fixture: Path | None = None, output: Path | None = No
     normalized = normalize_records(records, normalizer)
 
     if output:
-        summary = make_summary([normalized], settings, status="fixture" if fixture else "live")
+        summary = make_summary([normalized], settings, status="fixture" if fixture else "probe")
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
         return summary
 
     store = R2Store.from_env()
-    stamp = datetime.now(timezone.utc).strftime("%Y/%m/%d/%H%M")
+    collected_at = datetime.now(UTC)
+    stamp = collected_at.strftime("%Y/%m/%d/%H%M")
     raw_key = f"{settings['raw_prefix']}/{stamp}.json.gz"
     store.put_gzip_json(raw_key, normalized)
 
-    keys = store.list_keys(f"{settings['raw_prefix']}/", limit=72)[-48:]
-    snapshots = [store.get_json(key) for key in keys]
-    if not snapshots or keys[-1] != raw_key:
-        snapshots.append(normalized)
-    summary = make_summary(snapshots[-48:], settings)
+    review_rows = [row for row in normalized if row.get("review_status") in {"hold", "conflict"}]
+    if review_rows:
+        store.put_json(
+            f"review/{stamp}.json",
+            review_rows,
+            cache_control="private, max-age=300",
+        )
 
-    hourly_key = f"{settings['hourly_prefix']}/{datetime.now(timezone.utc).strftime('%Y-%m-%d')}.json"
+    keys = recent_raw_keys(store, settings["raw_prefix"], now=collected_at)
+    snapshots = [store.get_json(key) for key in keys]
+    if raw_key not in keys:
+        snapshots.append(normalized)
+    summary = make_summary(snapshots, settings)
+
+    hourly_key = f"{settings['hourly_prefix']}/{datetime.now(UTC).strftime('%Y-%m-%d')}.json"
     store.put_json(hourly_key, summary["timeseries"], cache_control="private, max-age=300")
     # Publish latest only after raw persistence and all aggregation have succeeded.
     store.put_json(f"{settings['public_prefix']}/latest.json", summary)
@@ -117,7 +168,11 @@ def collect_and_publish(*, fixture: Path | None = None, output: Path | None = No
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Collect and publish STREAM PULSE data")
-    parser.add_argument("--fixture", type=Path, help="Read raw YouTube-like records instead of calling the API")
+    parser.add_argument(
+        "--fixture",
+        type=Path,
+        help="Read raw YouTube-like records instead of calling the API",
+    )
     parser.add_argument("--output", type=Path, help="Write summary locally instead of R2")
     args = parser.parse_args()
     summary = collect_and_publish(fixture=args.fixture, output=args.output)
