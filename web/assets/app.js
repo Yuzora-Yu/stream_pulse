@@ -1,4 +1,4 @@
-import { formatHour, formatNumber, formatObservedAt, rankingSortKey, statusPresentation } from "./format.js";
+import { compareRankingRows, formatCutoff, formatHour, formatNumber, formatObservationPoint, formatObservedAt, statusPresentation } from "./format.js";
 
 const state = { data: null, period: "live", sort: "streamers", query: "" };
 const $ = selector => document.querySelector(selector);
@@ -39,7 +39,10 @@ function renderStatus() {
   $("#last-success-at").textContent = formatObservedAt(meta.last_success_at);
   $("#interval").textContent = `${formatNumber(meta.observation_interval_minutes)}分`;
   const cutoff = meta.cutoff || {};
-  $("#cutoff-label").textContent = `登録者${formatNumber(cutoff.min_subscribers)}以上 ${cutoff.operator || "OR"} 同接${formatNumber(cutoff.min_concurrent_viewers)}以上`;
+  const cutoffText = formatCutoff(cutoff);
+  $("#cutoff-label").textContent = cutoffText.replace("足切り：", "");
+  $("#now-observed-at").textContent = formatObservationPoint(meta.observed_at);
+  $("#now-cutoff").textContent = cutoffText;
 }
 
 function renderMetrics() {
@@ -71,10 +74,9 @@ function renderPeaks() {
 
 function rankingRows() {
   const rows = [...(state.data.rankings?.[state.period] || [])];
-  const key = rankingSortKey(state.period, state.sort);
   return rows
     .filter(item => !state.query || `${item.display_name} ${item.game_id}`.toLowerCase().includes(state.query))
-    .sort((a, b) => (Number(b[key]) || 0) - (Number(a[key]) || 0) || a.display_name.localeCompare(b.display_name, "ja"));
+    .sort((a, b) => compareRankingRows(a, b, state.period, state.sort));
 }
 
 function renderRanking() {
@@ -92,21 +94,38 @@ function renderRanking() {
 
 function rankingItem(item, index, isLive) {
   const li = document.createElement("li"); li.className = "ranking-item";
+  const topStream = isLive ? item.live_streams?.[0] : null;
+  const row = topStream ? document.createElement("a") : document.createElement("div");
+  row.className = "ranking-row";
+  if (topStream) {
+    row.href = topStream.url || `https://www.youtube.com/watch?v=${encodeURIComponent(topStream.video_id)}`;
+    row.target = "_blank";
+    row.rel = "noopener noreferrer";
+    row.setAttribute("aria-label", `${item.display_name}の配信を見る：${topStream.title || topStream.channel_title}`);
+  }
   const identity = document.createElement("div"); identity.className = "game-identity";
   const rank = document.createElement("span"); rank.className = "rank-no"; rank.textContent = String(index + 1).padStart(2, "0");
   const nameWrap = document.createElement("div");
   const name = document.createElement("strong"); name.textContent = item.display_name;
   const id = document.createElement("small"); id.textContent = item.game_id;
-  nameWrap.append(name, id); identity.append(rank, nameWrap);
+  nameWrap.append(name, id);
+  if (topStream) {
+    const jump = document.createElement("span"); jump.className = "stream-jump";
+    const extra = Math.max(0, (item.live_streams?.length || 1) - 1);
+    jump.textContent = `▶ ${topStream.channel_title || "YouTube"}の配信へ${extra ? ` ＋${extra}件` : ""}`;
+    nameWrap.append(jump);
+  }
+  identity.append(rank, nameWrap);
   const values = isLive
     ? [[item.live_streamers, "STREAMERS", 0], [item.current_viewers, "VIEWERS", 0], [item.viewer_density, "PER STREAMER", 1]]
     : [[item.unique_streamers, "UNIQUE", 0], [item.viewer_hours, "HOURS", 1], [item.view_delta, "VIEWS", 0]];
-  li.append(identity, ...values.map(([value, label, digits]) => {
+  row.append(identity, ...values.map(([value, label, digits]) => {
     const wrap = document.createElement("div"); wrap.className = "ranking-value";
     const strong = document.createElement("strong"); strong.textContent = formatNumber(value, digits);
     const span = document.createElement("span"); span.textContent = label;
     wrap.append(strong, span); return wrap;
   }));
+  li.append(row);
   return li;
 }
 

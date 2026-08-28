@@ -285,6 +285,42 @@ class AggregationTests(unittest.TestCase):
         self.assertEqual(snapshot["totals"]["live_streamers"], 1)
         self.assertEqual(window["totals"]["unique_streamers"], 1)
 
+    def test_same_channel_game_uses_top_stream_and_exposes_youtube_link(self):
+        rows = [
+            {
+                "observed_at": "2026-08-28T14:00:00Z",
+                "video_id": "lower",
+                "channel_id": "same-channel",
+                "channel_title": "Streamer",
+                "raw_title": "Minecraft lower",
+                "canonical_game_id": "minecraft",
+                "display_name": "Minecraft",
+                "review_status": "auto",
+                "subscriber_count": 5000,
+                "concurrent_viewers": 20,
+            },
+            {
+                "observed_at": "2026-08-28T14:00:00Z",
+                "video_id": "higher",
+                "channel_id": "same-channel",
+                "channel_title": "Streamer",
+                "raw_title": "Minecraft higher",
+                "canonical_game_id": "minecraft",
+                "display_name": "Minecraft",
+                "review_status": "auto",
+                "subscriber_count": 5000,
+                "concurrent_viewers": 100,
+            },
+        ]
+        game = aggregate_snapshot(rows, self.cutoff)["games"][0]
+        self.assertEqual(game["live_streamers"], 1)
+        self.assertEqual(game["current_viewers"], 100)
+        self.assertEqual(game["live_streams"][0]["video_id"], "higher")
+        self.assertEqual(
+            game["live_streams"][0]["url"],
+            "https://www.youtube.com/watch?v=higher",
+        )
+
     def test_empty_public_ranking_is_blocked(self):
         settings = read_json("config/config.json")
         held = [[{"observed_at": "2026-08-28T09:00:00Z", "review_status": "hold"}]]

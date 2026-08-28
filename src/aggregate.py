@@ -27,6 +27,20 @@ def aggregate_snapshot(
         and row.get("review_status") == "auto"
         and eligible(row, cutoff)
     ]
+    distinct_rows: dict[tuple[str, str], dict[str, Any]] = {}
+    for row in rows:
+        identity = str(row.get("channel_id") or row.get("video_id") or "unknown")
+        key = (str(row["canonical_game_id"]), identity)
+        current = distinct_rows.get(key)
+        if current is None or (
+            int(row.get("concurrent_viewers") or 0),
+            str(row.get("video_id") or ""),
+        ) > (
+            int(current.get("concurrent_viewers") or 0),
+            str(current.get("video_id") or ""),
+        ):
+            distinct_rows[key] = row
+    rows = list(distinct_rows.values())
     observed_at = max(
         (row["observed_at"] for row in source_rows if row.get("observed_at")),
         default=_now(),
@@ -40,18 +54,34 @@ def aggregate_snapshot(
                 "game_id": game_id,
                 "display_name": row.get("display_name", game_id),
                 "channel_ids": set(),
-                "video_ids": set(),
+                "live_streams": [],
                 "current_viewers": 0,
             },
         )
         game["channel_ids"].add(row.get("channel_id"))
-        game["video_ids"].add(row.get("video_id"))
         game["current_viewers"] += int(row.get("concurrent_viewers") or 0)
+        if row.get("video_id"):
+            game["live_streams"].append(
+                {
+                    "video_id": row["video_id"],
+                    "url": f"https://www.youtube.com/watch?v={row['video_id']}",
+                    "title": row.get("raw_title", ""),
+                    "channel_title": row.get("channel_title", ""),
+                    "current_viewers": int(row.get("concurrent_viewers") or 0),
+                }
+            )
 
     public_games = []
     for game in games.values():
         live_streamers = len({value for value in game.pop("channel_ids") if value})
-        game.pop("video_ids")
+        game["live_streams"].sort(
+            key=lambda stream: (
+                -int(stream["current_viewers"]),
+                str(stream["channel_title"]),
+                str(stream["video_id"]),
+            )
+        )
+        game["live_streams"] = game["live_streams"][:5]
         public_games.append(
             {
                 **game,

@@ -27,6 +27,7 @@
         <p class="eyebrow">YOUTUBE GAMING / 30 MIN OBSERVATION</p>
         <h1 id="page-title">いま、何が配信され、<br><em>どれだけ見られているか。</em></h1>
         <p class="hero-copy">ゲーム配信の「供給」と「需要」を分けて観測。単発の人気順ではなく、時間とともに変わる配信の鼓動を記録します。</p>
+        <a class="hero-cta" href="#ranking"><span>いまのランキングを見る</span><strong aria-hidden="true">↓</strong></a>
       </div>
       <aside class="pulse-status" aria-label="観測ステータス">
         <div class="status-head"><span>OBSERVATION STATUS</span><strong id="status-label">読込中</strong></div>
@@ -43,7 +44,7 @@
     <section class="metric-section" aria-labelledby="now-title">
       <div class="section-heading">
         <div><p class="eyebrow">CURRENT SNAPSHOT</p><h2 id="now-title">配信のいま</h2></div>
-        <p>配信本数ではなく、同一チャンネル × ゲームを1人として集計します。</p>
+        <div class="now-context"><strong id="now-observed-at">—</strong><span id="now-cutoff">足切り条件を読込中</span><small>同一チャンネル × ゲームを1人として集計</small></div>
       </div>
       <div class="metric-grid">
         <article class="metric-card is-cyan"><span>LIVE STREAMERS</span><strong id="metric-streamers">—</strong><p>現在のユニーク配信者</p></article>
@@ -65,7 +66,7 @@
       <div class="peak-grid" id="peak-grid"></div>
     </section>
 
-    <section class="ranking-section" aria-labelledby="ranking-title">
+    <section class="ranking-section" id="ranking" aria-labelledby="ranking-title">
       <div class="section-heading ranking-heading">
         <div><p class="eyebrow">GAME RANKINGS</p><h2 id="ranking-title">ゲーム別ランキング</h2></div>
         <p>配信者が多いゲームと、視聴が集まるゲームを同じ数字として混ぜません。</p>

@@ -46,6 +46,12 @@ Status: accepted
 
 The checked-in catalog is a broad seed, not a closed list. Production observations retain title hashtags in private R2. A new hashtag co-occurring with a confidently classified game becomes a learned alias after three distinct channels agree. A hashtag from otherwise unclassified gaming streams becomes a learned game after five distinct channels agree. Single-channel terms remain review candidates, generic streaming tags are rejected, and all learned state is auditable in `dictionary/state.json`.
 
+## 2026-08-28: Live ranking rows deep-link to the leading stream
+
+Status: accepted
+
+Each live game carries up to five eligible stream references ordered by concurrent viewers. The dashboard ranking row links to the current highest-viewed YouTube stream; historical 24-hour rows remain non-clickable. When one channel has multiple videos for the same game, only its highest-viewed video contributes to the snapshot so streamer and viewer totals share the same deduplication unit.
+
 ## Format compatibility
 
 The current public document uses `schema_version: 1`. Any future incompatible change requires an explicit reader/migration path. Unknown versions must not be silently rewritten or treated as version 1.
