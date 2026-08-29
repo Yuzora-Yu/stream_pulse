@@ -224,6 +224,7 @@ def collect_and_publish(
             alias_min_channels=int(learning.get("alias_min_channels", 3)),
             game_min_channels=int(learning.get("game_min_channels", 5)),
             candidate_limit=int(learning.get("candidate_limit", 2000)),
+            promote_game_candidates=bool(learning.get("promote_game_candidates", True)),
         )
     diagnostics = collection_diagnostics(normalized)
     if not fixture:

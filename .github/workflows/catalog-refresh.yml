@@ -1,0 +1,50 @@
+name: Refresh compiled game catalog
+
+on:
+  schedule:
+    # Sunday 05:00 JST = Saturday 20:00 UTC
+    - cron: "0 20 * * 6"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    env:
+      GAME_CATALOG_REPO: ${{ vars.GAME_CATALOG_REPO || 'Yuzora-Yu/game_catalog' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.GAME_CATALOG_REPO }}
+          token: ${{ secrets.GAME_CATALOG_TOKEN }}
+          path: runtime/game_catalog
+      - name: Copy compatibility build
+        run: |
+          cp runtime/game_catalog/dist/game_master.json config/game_master.json
+          cp runtime/game_catalog/dist/aliases.json config/aliases.json
+      - name: Test classifier
+        run: python -m unittest discover -s tests -p "test_*.py"
+      - name: Open refresh PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- config/game_master.json config/aliases.json; then
+            echo "Catalog already current"
+            exit 0
+          fi
+          branch="bot/catalog-refresh-$(date -u +%Y%m%d)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add config/game_master.json config/aliases.json
+          git commit -m "Refresh compiled game catalog"
+          git push origin "$branch"
+          gh pr create \
+            --base main \
+            --head "$branch" \
+            --title "Refresh game catalog $(date -u +%Y-%m-%d)" \
+            --body "game_catalog の互換ビルドを取り込みます。"

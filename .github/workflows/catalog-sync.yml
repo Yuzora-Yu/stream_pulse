@@ -1,0 +1,67 @@
+name: Sync observations to game_catalog
+
+on:
+  schedule:
+    # Sunday 02:20 JST = Saturday 17:20 UTC
+    - cron: "20 17 * * 6"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_BUCKET: ${{ vars.R2_BUCKET }}
+      GAME_CATALOG_REPO: ${{ vars.GAME_CATALOG_REPO || 'Yuzora-Yu/game_catalog' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Export compact 24h observation bundle
+        run: python -m src.catalog_sync --hours 24 --output runtime/stream-pulse-observations.json
+      - name: Checkout game catalog
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.GAME_CATALOG_REPO }}
+          token: ${{ secrets.GAME_CATALOG_TOKEN }}
+          path: game_catalog
+      - name: Import observations and rebuild catalog
+        run: |
+          mkdir -p game_catalog/incoming/stream_pulse
+          cp runtime/stream-pulse-observations.json game_catalog/incoming/stream_pulse/latest.json
+          cd game_catalog
+          python -m catalog.import_observations incoming/stream_pulse/latest.json
+          python -m catalog.validate
+          python -m catalog.build
+      - name: Push catalog PR
+        env:
+          GH_TOKEN: ${{ secrets.GAME_CATALOG_TOKEN }}
+        run: |
+          cd game_catalog
+          if git diff --quiet; then
+            echo "No catalog changes"
+            exit 0
+          fi
+          branch="bot/stream-pulse-$(date -u +%Y%m%d)"
+          git config user.name "stream-pulse-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add incoming/stream_pulse/latest.json data/observations/stream_pulse.json dist public
+          git commit -m "Import weekly stream observations"
+          git push --force-with-lease origin "$branch"
+          gh pr create \
+            --repo "$GAME_CATALOG_REPO" \
+            --base main \
+            --head "$branch" \
+            --title "Import stream observations $(date -u +%Y-%m-%d)" \
+            --body "stream_pulse の直近24時間から、ゲーム活動・未知alias・最新配信5件を集約した週次同期です。rawログは含みません。" \
+          || true

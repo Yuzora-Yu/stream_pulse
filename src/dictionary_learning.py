@@ -117,6 +117,7 @@ def update_dictionary_state(
     alias_min_channels: int = 3,
     game_min_channels: int = 5,
     candidate_limit: int = 2000,
+    promote_game_candidates: bool = True,
 ) -> dict[str, Any]:
     updated = validate_dictionary_state(state)
     alias_candidates = updated["alias_candidates"]
@@ -185,6 +186,8 @@ def update_dictionary_state(
             _add_unique(learned, alias, limit=100)
 
     for alias, entry in list(game_candidates.items()):
+        if not promote_game_candidates:
+            continue
         channels = entry.get("channel_ids", [])
         confirmed_channels = entry.get("confirmed_channel_ids", [])
         enough_channels = isinstance(channels, list) and len(channels) >= game_min_channels

@@ -446,3 +446,58 @@ class PublicExportTests(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 
+
+
+class CatalogSyncTests(unittest.TestCase):
+    def test_observation_bundle_keeps_activity_and_unknown_alias(self):
+        from src.catalog_sync import build_observation_bundle
+
+        snapshots = [[
+            {
+                "observed_at": "2026-08-29T00:00:00Z",
+                "video_id": "video-1",
+                "channel_id": "channel-1",
+                "channel_title": "Streamer A",
+                "raw_title": "Minecraft #マイクラ部",
+                "canonical_game_id": "minecraft",
+                "review_status": "auto",
+            },
+            {
+                "observed_at": "2026-08-29T00:00:00Z",
+                "video_id": "video-2",
+                "channel_id": "channel-2",
+                "channel_title": "Streamer B",
+                "raw_title": "新作 #謎ゲーム",
+                "canonical_game_id": None,
+                "review_status": "hold",
+            },
+        ]]
+        bundle = build_observation_bundle(
+            snapshots,
+            known_aliases={"minecraft"},
+            generated_at="2026-08-29T01:00:00Z",
+        )
+        self.assertEqual(bundle["games"]["minecraft"]["latest_streams"][0]["video_id"], "video-1")
+        self.assertEqual(bundle["aliases"]["マイクラ部"]["candidate_game_ids"], ["minecraft"])
+        self.assertEqual(bundle["aliases"]["謎ゲーム"]["candidate_game_ids"], [])
+        self.assertEqual(bundle["aliases"]["謎ゲーム"]["latest_streams"][0]["channel_title"], "Streamer B")
+
+    def test_game_candidate_can_be_kept_for_review_without_promotion(self):
+        records = [
+            {
+                "observed_at": "2026-08-29T00:00:00Z",
+                "channel_id": f"channel-{index}",
+                "raw_title": "新作 #未確認ゲーム",
+                "canonical_game_id": None,
+                "review_status": "hold",
+            }
+            for index in range(5)
+        ]
+        state = update_dictionary_state(
+            empty_dictionary_state(),
+            records,
+            known_aliases=set(),
+            promote_game_candidates=False,
+        )
+        self.assertEqual(state["learned_games"], {})
+        self.assertIn("未確認ゲーム", state["game_candidates"])

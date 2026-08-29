@@ -13,7 +13,8 @@
   "dictionary_learning": {
     "alias_min_channels": 3,
     "game_min_channels": 5,
-    "candidate_limit": 2000
+    "candidate_limit": 2000,
+    "promote_game_candidates": false
   },
   "cutoff": {
     "min_subscribers": 1000,
@@ -26,4 +27,3 @@
   "hourly_prefix": "hourly",
   "daily_prefix": "daily"
 }
-
