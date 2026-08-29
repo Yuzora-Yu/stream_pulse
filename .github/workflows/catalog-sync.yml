@@ -51,13 +51,13 @@ jobs:
             echo "No catalog changes"
             exit 0
           fi
-          branch="bot/stream-pulse-$(date -u +%Y%m%d)"
+          branch="bot/stream-pulse-$(date -u +%Y%m%d)-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           git config user.name "stream-pulse-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "$branch"
           git add incoming/stream_pulse/latest.json data/observations/stream_pulse.json dist public
           git commit -m "Import weekly stream observations"
-          git push --force-with-lease origin "$branch"
+          git push origin "$branch"
           gh pr create \
             --repo "$GAME_CATALOG_REPO" \
             --base main \
