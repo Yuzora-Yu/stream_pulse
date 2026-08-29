@@ -2,9 +2,9 @@ name: Collect 30-minute snapshot
 
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "57 * * * *"
     - cron: "8 * * * *"
-    - cron: "30 * * * *"
+    - cron: "27 * * * *"
     - cron: "38 * * * *"
   workflow_dispatch:
 
@@ -33,6 +33,26 @@ jobs:
           cache: pip
       - run: pip install -r requirements.txt
       - run: python -m unittest discover -s tests -p "test_*.py"
+      - name: Wait for the exact observation boundary
+        if: ${{ github.event_name == 'schedule' && (github.event.schedule == '57 * * * *' || github.event.schedule == '27 * * * *') }}
+        env:
+          SCHEDULE_CRON: ${{ github.event.schedule }}
+        run: |
+          python - <<'PY'
+          import os
+          import time
+          from datetime import UTC, datetime, timedelta
+
+          now = datetime.now(UTC)
+          if os.environ["SCHEDULE_CRON"].startswith("57"):
+              target = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
+          else:
+              target = now.replace(minute=30, second=0, microsecond=0)
+          delay = (target - now).total_seconds()
+          if 0 < delay <= 5 * 60:
+              print(f"Waiting {delay:.1f}s for {target.isoformat()}")
+              time.sleep(delay)
+          PY
       - name: Collect, aggregate, and publish last-good JSON
         id: collect_publish
         if: ${{ env.R2_ACCOUNT_ID != '' && env.R2_ACCESS_KEY_ID != '' && env.R2_SECRET_ACCESS_KEY != '' && env.R2_BUCKET != '' }}
@@ -43,8 +63,8 @@ jobs:
           args=()
           if [[ "$GITHUB_EVENT_NAME" == "schedule" ]]; then
             case "$SCHEDULE_CRON" in
-              "0 * * * *"|"8 * * * *") args+=(--scheduled-minute 0) ;;
-              "30 * * * *"|"38 * * * *") args+=(--scheduled-minute 30) ;;
+              "57 * * * *"|"8 * * * *") args+=(--scheduled-minute 0) ;;
+              "27 * * * *"|"38 * * * *") args+=(--scheduled-minute 30) ;;
             esac
           fi
           python -m src.pipeline --diagnostics-output runtime/collection-diagnostics.json "${args[@]}"

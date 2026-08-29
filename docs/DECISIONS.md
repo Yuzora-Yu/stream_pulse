@@ -56,7 +56,7 @@ Each live game carries up to five eligible stream references ordered by concurre
 
 Status: accepted
 
-GitHub scheduled the first `:00/:30` observation 18 minutes late and dropped other expected events. Primary cron events remain at `:00` and `:30`, with idempotent backups at `:08` and `:38`. Every event maps to its intended half-hour R2 key; an existing key is skipped before any YouTube request. Records retain the actual API completion time in `collected_at` while `observed_at` represents the canonical half-hour slot.
+GitHub scheduled the first `:00/:30` observation 18 minutes late and dropped other expected events. Primary jobs now start at `:57` and `:27`, outside the busiest cron boundary, then wait for the exact `:00` or `:30` observation time. Idempotent backups at `:08` and `:38` cover delayed or dropped primary jobs. Every event maps to its intended half-hour R2 key; an existing key is skipped before any YouTube request. Records retain the actual API completion time in `collected_at` while `observed_at` represents the canonical half-hour slot.
 
 ## 2026-08-29: Indie discovery favors gaming-specific metadata
 
