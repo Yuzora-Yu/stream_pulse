@@ -62,7 +62,7 @@ GitHub scheduled the first `:00/:30` observation 18 minutes late and dropped oth
 
 Status: accepted
 
-The live query targets `ゲーム実況` and `ゲーム配信` instead of generic live-stream terms, reducing non-game competition in the 100-result discovery ceiling. The seed catalog includes Japanese and international indie staples. For an unknown stream, a useful leading bracket label that is repeated in its description hashtag or YouTube tags is strong enough to create an auditable learned game from one channel; otherwise the existing five-channel threshold applies.
+One live query targets `ゲーム実況` and `ゲーム配信` instead of generic live-stream terms, reducing non-game competition. The second quota-budgeted query targets a compact Japanese indie watchlist, because YouTube search does not reliably match description hashtags for low-viewer streams. The seed catalog includes Japanese and international indie staples. For an unknown stream, a useful leading bracket label that is repeated in its description hashtag or YouTube tags is strong enough to create an auditable learned game from one channel; otherwise the existing five-channel threshold applies.
 
 ## Format compatibility
 

@@ -4,8 +4,11 @@
   "relevance_language": "ja",
   "video_category_id": "20",
   "observation_interval_minutes": 30,
-  "search_query": "ゲーム実況|ゲーム配信",
-  "search_pages": 2,
+  "search_queries": [
+    "ゲーム実況|ゲーム配信",
+    "奇天烈相談ダイヤル|都市伝説解体センター|日本事故物件監視協会|たろうくんはいってきました|雪葬|ウミガリ|文字化化|8番出口|パラノマサイト"
+  ],
+  "search_pages": 1,
   "search_page_size": 50,
   "dictionary_learning": {
     "alias_min_channels": 3,

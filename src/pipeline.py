@@ -230,7 +230,7 @@ def collect_and_publish(
         diagnostics["discovery"] = {
             "region_code": settings.get("region_code", "JP"),
             "relevance_language": settings.get("relevance_language", "ja"),
-            "query": settings.get("search_query"),
+            "queries": settings.get("search_queries") or [settings.get("search_query")],
             "requested_pages": int(settings.get("search_pages", 2)),
             "page_size": int(settings.get("search_page_size", 50)),
         }

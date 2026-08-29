@@ -47,34 +47,43 @@ class YouTubeClient:
         region_code: str = "JP",
         relevance_language: str = "ja",
         query: str | None = None,
+        queries: list[str] | None = None,
         pages: int = 2,
         page_size: int = 50,
     ) -> list[str]:
         ids: list[str] = []
-        token: str | None = None
-        for _ in range(max(1, pages)):
-            params: dict[str, Any] = {
-                "part": "snippet",
-                "type": "video",
-                "eventType": "live",
-                "order": "viewCount",
-                "regionCode": region_code,
-                "relevanceLanguage": relevance_language,
-                "maxResults": min(50, max(1, page_size)),
-            }
-            if query:
-                params["q"] = query
-            if token:
-                params["pageToken"] = token
-            payload = self._get("search", params)
-            ids.extend(
-                item.get("id", {}).get("videoId", "")
-                for item in payload.get("items", [])
-                if item.get("id", {}).get("videoId")
-            )
-            token = payload.get("nextPageToken")
-            if not token:
-                break
+        active_queries: list[str | None]
+        if queries:
+            active_queries = [value for value in queries if value]
+        elif query:
+            active_queries = [query]
+        else:
+            active_queries = [None]
+        for active_query in active_queries:
+            token: str | None = None
+            for _ in range(max(1, pages)):
+                params: dict[str, Any] = {
+                    "part": "snippet",
+                    "type": "video",
+                    "eventType": "live",
+                    "order": "viewCount",
+                    "regionCode": region_code,
+                    "relevanceLanguage": relevance_language,
+                    "maxResults": min(50, max(1, page_size)),
+                }
+                if active_query:
+                    params["q"] = active_query
+                if token:
+                    params["pageToken"] = token
+                payload = self._get("search", params)
+                ids.extend(
+                    item.get("id", {}).get("videoId", "")
+                    for item in payload.get("items", [])
+                    if item.get("id", {}).get("videoId")
+                )
+                token = payload.get("nextPageToken")
+                if not token:
+                    break
         return list(dict.fromkeys(ids))
 
     def fetch_live_details(self, video_ids: list[str]) -> list[dict[str, Any]]:
@@ -141,6 +150,7 @@ class YouTubeClient:
             region_code=settings.get("region_code", "JP"),
             relevance_language=settings.get("relevance_language", "ja"),
             query=settings.get("search_query"),
+            queries=settings.get("search_queries"),
             pages=int(settings.get("search_pages", 2)),
             page_size=int(settings.get("search_page_size", 50)),
         )
