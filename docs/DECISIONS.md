@@ -52,6 +52,18 @@ Status: accepted
 
 Each live game carries up to five eligible stream references ordered by concurrent viewers. The dashboard ranking row links to the current highest-viewed YouTube stream; historical 24-hour rows remain non-clickable. When one channel has multiple videos for the same game, only its highest-viewed video contributes to the snapshot so streamer and viewer totals share the same deduplication unit.
 
+## 2026-08-29: Half-hour slots use redundant scheduling
+
+Status: accepted
+
+GitHub scheduled the first `:00/:30` observation 18 minutes late and dropped other expected events. Primary cron events remain at `:00` and `:30`, with idempotent backups at `:08` and `:38`. Every event maps to its intended half-hour R2 key; an existing key is skipped before any YouTube request. Records retain the actual API completion time in `collected_at` while `observed_at` represents the canonical half-hour slot.
+
+## 2026-08-29: Indie discovery favors gaming-specific metadata
+
+Status: accepted
+
+The live query targets `ゲーム実況` and `ゲーム配信` instead of generic live-stream terms, reducing non-game competition in the 100-result discovery ceiling. The seed catalog includes Japanese and international indie staples. For an unknown stream, a useful leading bracket label that is repeated in its description hashtag or YouTube tags is strong enough to create an auditable learned game from one channel; otherwise the existing five-channel threshold applies.
+
 ## Format compatibility
 
 The current public document uses `schema_version: 1`. Any future incompatible change requires an explicit reader/migration path. Unknown versions must not be silently rewritten or treated as version 1.

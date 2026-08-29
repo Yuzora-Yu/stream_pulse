@@ -99,6 +99,16 @@ def write_json(path: Path, value: Any) -> None:
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def scheduled_slot(now: datetime, minute: int) -> datetime:
+    if minute not in {0, 30}:
+        raise ValueError("Scheduled minute must be 0 or 30")
+    now = now.astimezone(UTC)
+    candidate = now.replace(minute=minute, second=0, microsecond=0)
+    if candidate > now:
+        candidate -= timedelta(hours=1)
+    return candidate
+
+
 def make_summary(
     snapshots: list[list[dict[str, Any]]], settings: dict[str, Any], *, status: str = "live"
 ) -> dict[str, Any]:
@@ -173,9 +183,20 @@ def collect_and_publish(
     fixture: Path | None = None,
     output: Path | None = None,
     diagnostics_output: Path | None = None,
+    scheduled_minute: int | None = None,
 ) -> dict[str, Any]:
     settings, normalizer = load_settings()
     store = R2Store.from_env() if output is None else None
+    started_at = datetime.now(UTC)
+    snapshot_at = scheduled_slot(started_at, scheduled_minute) if scheduled_minute is not None else None
+    raw_key = (
+        f"{settings['raw_prefix']}/{snapshot_at.strftime('%Y/%m/%d/%H%M')}.json.gz"
+        if snapshot_at is not None
+        else None
+    )
+    if store is not None and raw_key is not None and store.exists(raw_key):
+        print(json.dumps({"status": "skipped", "reason": "scheduled_slot_exists", "key": raw_key}))
+        return store.get_json(f"{settings['public_prefix']}/latest.json")
     dictionary_state = empty_dictionary_state()
     if store is not None and fixture is None:
         dictionary_state = store.get_json_optional("dictionary/state.json") or dictionary_state
@@ -189,6 +210,11 @@ def collect_and_publish(
             raise RuntimeError("YOUTUBE_API_KEY is required")
         records = YouTubeClient(api_key).collect(settings)
     normalized = normalize_records(records, normalizer)
+    if snapshot_at is not None:
+        slot_timestamp = snapshot_at.isoformat().replace("+00:00", "Z")
+        for record in normalized:
+            record["collected_at"] = record.get("observed_at")
+            record["observed_at"] = slot_timestamp
     if store is not None and fixture is None:
         learning = settings.get("dictionary_learning", {})
         dictionary_state = update_dictionary_state(
@@ -227,8 +253,8 @@ def collect_and_publish(
     if store is None:
         raise RuntimeError("R2 store was not initialized for publication")
     collected_at = datetime.now(UTC)
-    stamp = collected_at.strftime("%Y/%m/%d/%H%M")
-    raw_key = f"{settings['raw_prefix']}/{stamp}.json.gz"
+    stamp = (snapshot_at or collected_at).strftime("%Y/%m/%d/%H%M")
+    raw_key = raw_key or f"{settings['raw_prefix']}/{stamp}.json.gz"
     store.put_gzip_json(raw_key, normalized)
     if fixture is None:
         store.put_json(
@@ -281,11 +307,18 @@ def main() -> None:
         type=Path,
         help="Write classification diagnostics even when publication is blocked",
     )
+    parser.add_argument(
+        "--scheduled-minute",
+        type=int,
+        choices=(0, 30),
+        help="Bucket this scheduled observation at minute 00 or 30 and skip duplicate slots",
+    )
     args = parser.parse_args()
     summary = collect_and_publish(
         fixture=args.fixture,
         output=args.output,
         diagnostics_output=args.diagnostics_output,
+        scheduled_minute=args.scheduled_minute,
     )
     print(json.dumps({"status": "ok", "observed_at": summary["meta"]["observed_at"]}, ensure_ascii=False))
 

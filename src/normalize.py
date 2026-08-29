@@ -86,12 +86,26 @@ class GameNormalizer:
 
         scores: dict[str, float] = {}
         evidence: dict[str, list[str]] = {}
+        title_hits = [
+            (game_id, alias)
+            for game_id, aliases in self.aliases.items()
+            for alias in aliases
+            if contains_alias(title, alias)
+        ]
+        title_hits = [
+            (game_id, alias)
+            for game_id, alias in title_hits
+            if not any(
+                alias != other_alias and alias in other_alias
+                for _, other_alias in title_hits
+            )
+        ]
+        for game_id, alias in title_hits:
+            scores[game_id] = max(scores.get(game_id, 0), 0.98 if title == alias else 0.9)
+            evidence.setdefault(game_id, []).append(f"title:{alias}")
         for game_id, aliases in self.aliases.items():
             for alias in aliases:
-                if contains_alias(title, alias):
-                    scores[game_id] = max(scores.get(game_id, 0), 0.98 if title == alias else 0.9)
-                    evidence.setdefault(game_id, []).append(f"title:{alias}")
-                elif contains_alias(description, alias):
+                if contains_alias(description, alias):
                     scores[game_id] = max(scores.get(game_id, 0), 0.62)
                     evidence.setdefault(game_id, []).append(f"description:{alias}")
 

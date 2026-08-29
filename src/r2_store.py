@@ -80,6 +80,18 @@ class R2Store:
                 return None
             raise
 
+    def exists(self, key: str) -> bool:
+        try:
+            self.client.head_object(Bucket=self.bucket, Key=key)
+            return True
+        except Exception as exc:
+            response = getattr(exc, "response", {})
+            code = str(response.get("Error", {}).get("Code", ""))
+            status = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
+            if code in {"NoSuchKey", "NotFound", "404"} or status == 404:
+                return False
+            raise
+
     def list_keys(self, prefix: str, *, limit: int = 1000) -> list[str]:
         paginator = self.client.get_paginator("list_objects_v2")
         pages = paginator.paginate(

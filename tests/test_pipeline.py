@@ -9,13 +9,20 @@ from src.collector import YouTubeClient
 from src.dictionary_learning import (
     dictionary_diagnostics,
     empty_dictionary_state,
+    extract_bracket_candidate,
     extract_hashtags,
     learned_catalog,
     update_dictionary_state,
 )
 from src.export_latest import export_latest, validate_public_summary
 from src.normalize import GameNormalizer, contains_alias, normalize_text
-from src.pipeline import PublicationGuardError, collection_diagnostics, make_summary, recent_raw_keys
+from src.pipeline import (
+    PublicationGuardError,
+    collection_diagnostics,
+    make_summary,
+    recent_raw_keys,
+    scheduled_slot,
+)
 from src.r2_store import R2Store
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -78,6 +85,8 @@ class NormalizationTests(unittest.TestCase):
             "【DBD】ライブ配信": "dead-by-daylight",
             "【ブルアカ】100回記念": "blue-archive",
             "【#鳴潮 /初見実況】メインストーリー": "wuthering-waves",
+            "【奇天烈相談ダイヤル】敏腕相談員の日常【塩】": "kiteretsu-sodan-dial",
+            "Hades II 初見プレイ": "hades-ii",
         }
         for title, game_id in cases.items():
             with self.subTest(title=title):
@@ -91,8 +100,8 @@ class NormalizationTests(unittest.TestCase):
         master = read_json("config/game_master.json")
         aliases = read_json("config/aliases.json")
         self.assertEqual(set(master), set(aliases))
-        self.assertGreaterEqual(len(master), 90)
-        self.assertGreaterEqual(sum(len(values) for values in aliases.values()), 300)
+        self.assertGreaterEqual(len(master), 150)
+        self.assertGreaterEqual(sum(len(values) for values in aliases.values()), 450)
 
     def test_collection_diagnostics_prioritizes_high_viewer_unknowns(self):
         diagnostics = collection_diagnostics(
@@ -167,7 +176,7 @@ class CollectorTests(unittest.TestCase):
                 "region_code": "JP",
                 "relevance_language": "ja",
                 "video_category_id": "20",
-                "search_query": "ゲーム|実況|配信|生放送|ライブ",
+                "search_query": "ゲーム実況|ゲーム配信",
                 "search_pages": 2,
                 "search_page_size": 50,
             }
@@ -175,7 +184,7 @@ class CollectorTests(unittest.TestCase):
 
         search_params = requests[0][1]
         self.assertEqual(search_params["part"], "snippet")
-        self.assertEqual(search_params["q"], "ゲーム|実況|配信|生放送|ライブ")
+        self.assertEqual(search_params["q"], "ゲーム実況|ゲーム配信")
         self.assertNotIn("videoCategoryId", search_params)
         self.assertNotIn("source_excluded_reason", records[0])
         self.assertEqual(records[1]["source_excluded_reason"], "video_category:10")
@@ -186,6 +195,10 @@ class DictionaryLearningTests(unittest.TestCase):
         self.assertEqual(
             extract_hashtags("【配信】Apex #エペ部 #ゲーム実況 #新人VTuber #shortslive #steam"),
             [("エペ部", "エペ部")],
+        )
+        self.assertEqual(
+            extract_bracket_candidate("【初見】遊びます【奇天烈相談ダイヤル】"),
+            ("奇天烈相談ダイヤル", "奇天烈相談ダイヤル"),
         )
 
     def test_learns_alias_after_three_distinct_channels(self):
@@ -228,6 +241,28 @@ class DictionaryLearningTests(unittest.TestCase):
         game_id = next(iter(master))
         self.assertEqual(master[game_id]["display_name"], "雪葬")
         self.assertEqual(aliases[game_id], ["雪葬"])
+
+    def test_one_stream_can_learn_game_when_title_and_metadata_agree(self):
+        state = update_dictionary_state(
+            empty_dictionary_state(),
+            [
+                {
+                    "observed_at": "2026-08-29T00:00:00Z",
+                    "channel_id": "indie-channel",
+                    "raw_title": "【奇天烈相談ダイヤル】敏腕相談員の日常【塩】",
+                    "description": "#ゲーム実況 #奇天烈相談ダイヤル #塩",
+                    "tags": [],
+                    "canonical_game_id": None,
+                    "review_status": "hold",
+                }
+            ],
+            known_aliases=set(),
+        )
+        master, aliases = learned_catalog(state)
+        self.assertEqual(len(master), 1)
+        game_id = next(iter(master))
+        self.assertEqual(master[game_id]["display_name"], "奇天烈相談ダイヤル")
+        self.assertEqual(aliases[game_id], ["奇天烈相談ダイヤル"])
 
 
 class AggregationTests(unittest.TestCase):
@@ -329,6 +364,16 @@ class AggregationTests(unittest.TestCase):
 
 
 class StorageWindowTests(unittest.TestCase):
+    def test_scheduled_slot_handles_delayed_primary_and_backup_runs(self):
+        self.assertEqual(
+            scheduled_slot(datetime(2026, 8, 29, 0, 48, tzinfo=UTC), 30),
+            datetime(2026, 8, 29, 0, 30, tzinfo=UTC),
+        )
+        self.assertEqual(
+            scheduled_slot(datetime(2026, 8, 29, 0, 5, tzinfo=UTC), 30),
+            datetime(2026, 8, 28, 23, 30, tzinfo=UTC),
+        )
+
     def test_recent_keys_are_filtered_to_true_24_hour_window(self):
         class FakeStore:
             def list_keys(self, prefix, *, limit=1000):

@@ -2,7 +2,10 @@ name: Collect 30-minute snapshot
 
 on:
   schedule:
-    - cron: "0,30 * * * *"
+    - cron: "0 * * * *"
+    - cron: "8 * * * *"
+    - cron: "30 * * * *"
+    - cron: "38 * * * *"
   workflow_dispatch:
 
 concurrency:
@@ -34,7 +37,17 @@ jobs:
         id: collect_publish
         if: ${{ env.R2_ACCOUNT_ID != '' && env.R2_ACCESS_KEY_ID != '' && env.R2_SECRET_ACCESS_KEY != '' && env.R2_BUCKET != '' }}
         continue-on-error: true
-        run: python -m src.pipeline --diagnostics-output runtime/collection-diagnostics.json
+        env:
+          SCHEDULE_CRON: ${{ github.event.schedule }}
+        run: |
+          args=()
+          if [[ "$GITHUB_EVENT_NAME" == "schedule" ]]; then
+            case "$SCHEDULE_CRON" in
+              "0 * * * *"|"8 * * * *") args+=(--scheduled-minute 0) ;;
+              "30 * * * *"|"38 * * * *") args+=(--scheduled-minute 30) ;;
+            esac
+          fi
+          python -m src.pipeline --diagnostics-output runtime/collection-diagnostics.json "${args[@]}"
       - name: Validate the live YouTube sensor before R2 is configured
         id: collect_probe
         if: ${{ env.R2_ACCOUNT_ID == '' || env.R2_ACCESS_KEY_ID == '' || env.R2_SECRET_ACCESS_KEY == '' || env.R2_BUCKET == '' }}

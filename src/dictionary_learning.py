@@ -79,6 +79,15 @@ def extract_hashtags(text: str) -> list[tuple[str, str]]:
     return list(dict.fromkeys(results))
 
 
+def extract_bracket_candidate(text: str) -> tuple[str, str] | None:
+    for raw in re.findall(r"[【\[]([^】\]]{2,60})[】\]]", text or ""):
+        display = raw.strip()
+        alias = normalize_text(display)
+        if _usable_hashtag(alias):
+            return alias, display
+    return None
+
+
 def learned_catalog(state: dict[str, Any]) -> tuple[dict[str, dict[str, Any]], dict[str, list[str]]]:
     valid = validate_dictionary_state(state)
     master: dict[str, dict[str, Any]] = {}
@@ -137,7 +146,16 @@ def update_dictionary_state(
                 channels = entry.setdefault("games", {}).setdefault(game_id, [])
                 _add_unique(channels, channel_id, limit=20)
         elif record.get("review_status") in {"hold", "conflict"}:
-            for alias, display in hashtags:
+            candidates = list(hashtags)
+            bracket_candidate = extract_bracket_candidate(str(record.get("raw_title") or ""))
+            metadata_aliases = {alias for alias, _ in extract_hashtags(str(record.get("description") or ""))}
+            for tag in record.get("tags") or []:
+                normalized_tag = normalize_text(str(tag))
+                if _usable_hashtag(normalized_tag):
+                    metadata_aliases.add(normalized_tag)
+            if bracket_candidate and bracket_candidate not in candidates:
+                candidates.append(bracket_candidate)
+            for alias, display in candidates:
                 if alias in known_aliases:
                     continue
                 entry = game_candidates.setdefault(
@@ -145,6 +163,7 @@ def update_dictionary_state(
                     {
                         "display": display,
                         "channel_ids": [],
+                        "confirmed_channel_ids": [],
                         "sample_titles": [],
                         "first_seen": observed_at,
                         "last_seen": observed_at,
@@ -152,6 +171,8 @@ def update_dictionary_state(
                 )
                 entry["last_seen"] = max(str(entry.get("last_seen") or ""), observed_at)
                 _add_unique(entry["channel_ids"], channel_id, limit=20)
+                if bracket_candidate and alias == bracket_candidate[0] and alias in metadata_aliases:
+                    _add_unique(entry["confirmed_channel_ids"], channel_id, limit=20)
                 _add_unique(entry["sample_titles"], str(record.get("raw_title") or ""), limit=3)
 
     for alias, entry in list(alias_candidates.items()):
@@ -165,7 +186,10 @@ def update_dictionary_state(
 
     for alias, entry in list(game_candidates.items()):
         channels = entry.get("channel_ids", [])
-        if not isinstance(channels, list) or len(channels) < game_min_channels:
+        confirmed_channels = entry.get("confirmed_channel_ids", [])
+        enough_channels = isinstance(channels, list) and len(channels) >= game_min_channels
+        metadata_confirmed = isinstance(confirmed_channels, list) and bool(confirmed_channels)
+        if not enough_channels and not metadata_confirmed:
             continue
         game_id = _learned_game_id(alias)
         updated["learned_games"].setdefault(
@@ -175,6 +199,7 @@ def update_dictionary_state(
                 "aliases": [alias],
                 "source": "multi_channel_title_hashtag",
                 "channel_count": len(channels),
+                "metadata_confirmed": metadata_confirmed,
                 "first_seen": entry.get("first_seen"),
                 "promoted_at": entry.get("last_seen"),
             },
