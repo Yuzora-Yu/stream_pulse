@@ -26,8 +26,8 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt
-      - name: Export compact 24h observation bundle
-        run: python -m src.catalog_sync --hours 24 --output runtime/stream-pulse-observations.json
+      - name: Export compact 7-day observation bundle
+        run: python -m src.catalog_sync --hours 168 --output runtime/stream-pulse-observations.json
       - name: Checkout game catalog
         uses: actions/checkout@v4
         with:
@@ -63,5 +63,5 @@ jobs:
             --base main \
             --head "$branch" \
             --title "Import stream observations $(date -u +%Y-%m-%d)" \
-            --body "stream_pulse の直近24時間から、ゲーム活動・未知alias・最新配信5件を集約した週次同期です。rawログは含みません。" \
+            --body "stream_pulse の直近168時間（7日間）から、ゲーム活動・未知alias・最新配信5件を集約した週次同期です。rawログは含みません。" \
           || true
