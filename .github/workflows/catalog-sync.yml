@@ -1,9 +1,7 @@
 name: Sync observations to game_catalog
 
 on:
-  schedule:
-    # Sunday 02:20 JST = Saturday 17:20 UTC
-    - cron: "20 17 * * 6"
+  # Automatic observation sync paused on 2026-08-31.
   workflow_dispatch:
 
 permissions:

@@ -1,9 +1,7 @@
 name: Refresh compiled game catalog
 
 on:
-  schedule:
-    # Sunday 05:00 JST = Saturday 20:00 UTC
-    - cron: "0 20 * * 6"
+  # Automatic catalog refresh paused on 2026-08-31.
   workflow_dispatch:
 
 permissions:
