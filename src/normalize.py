@@ -15,9 +15,13 @@ def normalize_text(value: str) -> str:
 def contains_alias(text: str, alias: str) -> bool:
     if not alias:
         return False
+    return alias_pattern(alias).search(text) is not None
+
+
+def alias_pattern(alias: str) -> re.Pattern[str]:
     left = r"(?<![a-z0-9])" if alias[0].isascii() and alias[0].isalnum() else ""
     right = r"(?![a-z0-9])" if alias[-1].isascii() and alias[-1].isalnum() else ""
-    return re.search(f"{left}{re.escape(alias)}{right}", text) is not None
+    return re.compile(f"{left}{re.escape(alias)}{right}")
 
 
 @dataclass(frozen=True)
@@ -52,6 +56,7 @@ class GameNormalizer:
             game_id: sorted({normalize_text(alias) for alias in values}, key=len, reverse=True)
             for game_id, values in aliases.items()
         }
+        self._rebuild_alias_patterns()
         self.title_exclusions = [normalize_text(x) for x in exclusions.get("title_terms", [])]
         self.description_exclusions = [normalize_text(x) for x in exclusions.get("description_terms", [])]
         self.excluded_channels = set(exclusions.get("channel_ids", []))
@@ -66,6 +71,15 @@ class GameNormalizer:
             combined = set(self.aliases.get(game_id, []))
             combined.update(normalize_text(alias) for alias in values)
             self.aliases[game_id] = sorted(combined, key=len, reverse=True)
+        self._rebuild_alias_patterns()
+
+    def _rebuild_alias_patterns(self) -> None:
+        self.alias_patterns = [
+            (game_id, alias, alias_pattern(alias))
+            for game_id, aliases in self.aliases.items()
+            for alias in aliases
+            if alias
+        ]
 
     def known_aliases(self) -> set[str]:
         return {alias for values in self.aliases.values() for alias in values}
@@ -88,9 +102,8 @@ class GameNormalizer:
         evidence: dict[str, list[str]] = {}
         title_hits = [
             (game_id, alias)
-            for game_id, aliases in self.aliases.items()
-            for alias in aliases
-            if contains_alias(title, alias)
+            for game_id, alias, pattern in self.alias_patterns
+            if pattern.search(title)
         ]
         title_hits = [
             (game_id, alias)
@@ -103,11 +116,10 @@ class GameNormalizer:
         for game_id, alias in title_hits:
             scores[game_id] = max(scores.get(game_id, 0), 0.98 if title == alias else 0.9)
             evidence.setdefault(game_id, []).append(f"title:{alias}")
-        for game_id, aliases in self.aliases.items():
-            for alias in aliases:
-                if contains_alias(description, alias):
-                    scores[game_id] = max(scores.get(game_id, 0), 0.62)
-                    evidence.setdefault(game_id, []).append(f"description:{alias}")
+        for game_id, alias, pattern in self.alias_patterns:
+            if pattern.search(description):
+                scores[game_id] = max(scores.get(game_id, 0), 0.62)
+                evidence.setdefault(game_id, []).append(f"description:{alias}")
 
         if not scores:
             return Classification(None, "未分類", 0.0, [], "hold")
