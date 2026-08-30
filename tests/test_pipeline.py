@@ -396,6 +396,24 @@ class StorageWindowTests(unittest.TestCase):
             ["raw/2026/08/27/1200.json.gz", "raw/2026/08/28/1130.json.gz"],
         )
 
+    def test_seven_day_window_lists_every_intermediate_day(self):
+        class FakeStore:
+            def __init__(self):
+                self.prefixes = []
+
+            def list_keys(self, prefix, *, limit=1000):
+                del limit
+                self.prefixes.append(prefix)
+                return [f"{prefix}1200.json.gz"]
+
+        store = FakeStore()
+        now = datetime(2026, 8, 30, 12, 0, tzinfo=UTC)
+        keys = recent_raw_keys(store, "raw", now=now, hours=168)
+        self.assertEqual(len(store.prefixes), 8)
+        self.assertIn("raw/2026/08/26/", store.prefixes)
+        self.assertIn("raw/2026/08/29/", store.prefixes)
+        self.assertEqual(len(keys), 8)
+
     def test_r2_listing_consumes_all_pages_before_taking_latest(self):
         class FakePaginator:
             def paginate(self, **kwargs):

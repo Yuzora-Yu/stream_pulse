@@ -161,7 +161,8 @@ def recent_raw_keys(
     """List raw snapshot keys inside a real time window without scanning all retention history."""
     now = now.astimezone(UTC)
     cutoff = now - timedelta(hours=hours)
-    days = {now.date(), cutoff.date()}
+    day_count = (now.date() - cutoff.date()).days
+    days = {cutoff.date() + timedelta(days=offset) for offset in range(day_count + 1)}
     keys: set[str] = set()
     for day in sorted(days):
         prefix = f"{raw_prefix}/{day.strftime('%Y/%m/%d')}/"
@@ -326,4 +327,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
