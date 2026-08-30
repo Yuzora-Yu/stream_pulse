@@ -197,7 +197,10 @@ class CollectorTests(unittest.TestCase):
 class DictionaryLearningTests(unittest.TestCase):
     def test_extracts_useful_hashtags_and_rejects_generic_tags(self):
         self.assertEqual(
-            extract_hashtags("【配信】Apex #エペ部 #ゲーム実況 #新人VTuber #shortslive #steam"),
+            extract_hashtags(
+                "【配信】Apex #エペ部 #ゲーム実況 #ゲーム配信 #初見さん大歓迎 "
+                "#新人VTuber #shortslive #steam #5【エーペックスレジェンズ】"
+            ),
             [("エペ部", "エペ部")],
         )
         self.assertEqual(

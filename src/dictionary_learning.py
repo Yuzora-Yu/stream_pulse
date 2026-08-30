@@ -29,6 +29,7 @@ GENERIC_HASHTAGS = {
     "xbox",
     "youtube",
     "ゲーム",
+    "ゲーム配信",
     "ゲーム実況",
     "スマホゲーム",
     "ホラーゲーム",
@@ -36,6 +37,11 @@ GENERIC_HASHTAGS = {
     "実況",
     "初見",
     "初見歓迎",
+    "初見さん大歓迎",
+    "初見大歓迎",
+    "毎日配信",
+    "ネタ勢",
+    "新マップ",
     "参加型",
     "生放送",
     "生配信",
@@ -71,7 +77,7 @@ def validate_dictionary_state(value: Any) -> dict[str, Any]:
 
 def extract_hashtags(text: str) -> list[tuple[str, str]]:
     results: list[tuple[str, str]] = []
-    for raw in re.findall(r"[#＃]([^\s#＃]{2,60})", text or ""):
+    for raw in re.findall(r"[#＃]([^\s#＃【】\[\]]{2,60})", text or ""):
         display = raw.strip(".,:;!?。、，：；！？)]}）】」』〉》")
         alias = normalize_text(display)
         if _usable_hashtag(alias):
@@ -80,7 +86,7 @@ def extract_hashtags(text: str) -> list[tuple[str, str]]:
 
 
 def extract_bracket_candidate(text: str) -> tuple[str, str] | None:
-    for raw in re.findall(r"[【\[]([^】\]]{2,60})[】\]]", text or ""):
+    for raw in re.findall(r"[【\[]([^【】\[\]]{2,60})[】\]]", text or ""):
         display = raw.strip()
         alias = normalize_text(display)
         if _usable_hashtag(alias):
