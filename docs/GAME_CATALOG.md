@@ -4,12 +4,14 @@
 
 ## 週次の流れ
 
-1. `catalog-sync.yml` がprivate R2の直近24時間raw snapshotを読む。
-2. `src.catalog_sync` がゲーム別活動と未知aliasだけをコンパクトなbundleにする。
+1. `catalog-sync.yml` がprivate R2の直近168時間（7日間）のraw snapshotを読む。
+2. `src.catalog_sync` がゲーム別活動と未知alias、およびsnapshot別件数だけをコンパクトなbundleにする。
 3. `game_catalog` をcheckoutし、bundleを `incoming/stream_pulse/latest.json` に保存する。
-4. `catalog.import_observations` が集約値と最新5配信を更新する。
+4. `catalog.import_observations` が未取込snapshotだけを加算し、集約値と最新5配信を更新する。
 5. `game_catalog` にPRを作る。raw snapshot全量はGitへ移さない。
 6. `catalog-refresh.yml` が確定済み `dist/game_master.json` / `dist/aliases.json` を取り込み、stream_pulse側へPRする。
+
+同じ7日窓を手動再実行しても、R2 object key由来のsnapshot IDで重複を除くため、観測回数を二重加算しません。
 
 ## 未知ゲームの扱い
 

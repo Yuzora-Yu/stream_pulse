@@ -3,6 +3,7 @@ import tempfile
 import unittest
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 from src.aggregate import aggregate_snapshot, aggregate_window, eligible
 from src.collector import YouTubeClient
@@ -452,7 +453,7 @@ class CatalogSyncTests(unittest.TestCase):
     def test_observation_bundle_keeps_activity_and_unknown_alias(self):
         from src.catalog_sync import build_observation_bundle
 
-        snapshots = [[
+        snapshots: list[list[dict[str, Any]]] = [[
             {
                 "observed_at": "2026-08-29T00:00:00Z",
                 "video_id": "video-1",
@@ -475,7 +476,17 @@ class CatalogSyncTests(unittest.TestCase):
         bundle = build_observation_bundle(
             snapshots,
             known_aliases={"minecraft"},
+            snapshot_ids=["raw/2026/08/29/0000.json.gz"],
             generated_at="2026-08-29T01:00:00Z",
+        )
+        self.assertEqual(bundle["schema_version"], 2)
+        self.assertEqual(
+            bundle["snapshot_counts"]["raw/2026/08/29/0000.json.gz"]["games"],
+            {"minecraft": 1},
+        )
+        self.assertEqual(
+            bundle["snapshot_counts"]["raw/2026/08/29/0000.json.gz"]["aliases"],
+            {"マイクラ部": 1, "謎ゲーム": 1},
         )
         self.assertEqual(bundle["games"]["minecraft"]["latest_streams"][0]["video_id"], "video-1")
         self.assertEqual(bundle["aliases"]["マイクラ部"]["candidate_game_ids"], ["minecraft"])

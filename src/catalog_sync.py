@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -12,6 +14,24 @@ from .pipeline import ROOT, load_json, recent_raw_keys
 from .r2_store import R2Store
 
 MAX_STREAMS = 5
+
+
+def _derived_snapshot_id(snapshot: list[dict[str, Any]]) -> str:
+    """Return a stable fallback ID for tests and callers without an R2 object key."""
+    identity = [
+        {
+            "observed_at": record.get("observed_at"),
+            "video_id": record.get("video_id"),
+            "channel_id": record.get("channel_id"),
+            "canonical_game_id": record.get("canonical_game_id"),
+            "review_status": record.get("review_status"),
+        }
+        for record in snapshot
+    ]
+    digest = hashlib.sha256(
+        json.dumps(identity, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    ).hexdigest()[:24]
+    return f"derived:{digest}"
 
 
 def _stream_sample(record: dict[str, Any]) -> dict[str, Any]:
@@ -40,22 +60,35 @@ def build_observation_bundle(
     snapshots: list[list[dict[str, Any]]],
     *,
     known_aliases: set[str],
+    snapshot_ids: list[str] | None = None,
     generated_at: str | None = None,
 ) -> dict[str, Any]:
+    if snapshot_ids is not None and len(snapshot_ids) != len(snapshots):
+        raise ValueError("snapshot_ids must align one-to-one with snapshots")
+    resolved_snapshot_ids = snapshot_ids or [_derived_snapshot_id(row) for row in snapshots]
+    if len(set(resolved_snapshot_ids)) != len(resolved_snapshot_ids):
+        raise ValueError("snapshot_ids must be unique within a bundle")
+
     game_rows: dict[str, dict[str, Any]] = {}
     alias_rows: dict[str, dict[str, Any]] = {}
+    snapshot_counts: dict[str, dict[str, Any]] = {}
     observed_times: list[str] = []
 
-    for snapshot in snapshots:
+    for snapshot_id, snapshot in zip(resolved_snapshot_ids, snapshots, strict=True):
+        snapshot_games: Counter[str] = Counter()
+        snapshot_aliases: Counter[str] = Counter()
+        snapshot_times: list[str] = []
         for record in snapshot:
             observed_at = str(record.get("observed_at") or "")
             if observed_at:
                 observed_times.append(observed_at)
+                snapshot_times.append(observed_at)
             video_id = str(record.get("video_id") or "")
             channel_id = str(record.get("channel_id") or "")
             sample = _stream_sample(record)
             game_id = str(record.get("canonical_game_id") or "")
             if record.get("review_status") == "auto" and game_id:
+                snapshot_games[game_id] += 1
                 entry = game_rows.setdefault(
                     game_id,
                     {
@@ -85,6 +118,7 @@ def build_observation_bundle(
             for alias, display in _candidate_terms(record):
                 if alias in known_aliases:
                     continue
+                snapshot_aliases[alias] += 1
                 entry = alias_rows.setdefault(
                     alias,
                     {
@@ -118,6 +152,12 @@ def build_observation_bundle(
                     previous = entry["latest_streams"].get(video_id)
                     if previous is None or str(previous.get("observed_at") or "") <= observed_at:
                         entry["latest_streams"][video_id] = sample
+
+        snapshot_counts[snapshot_id] = {
+            "observed_at": max(snapshot_times, default=None),
+            "games": dict(sorted(snapshot_games.items())),
+            "aliases": dict(sorted(snapshot_aliases.items())),
+        }
 
     games: dict[str, Any] = {}
     for game_id, entry in sorted(game_rows.items()):
@@ -157,9 +197,12 @@ def build_observation_bundle(
     window_from = min(observed_times) if observed_times else None
     window_to = max(observed_times) if observed_times else None
     generated = generated_at or datetime.now(UTC).isoformat().replace("+00:00", "Z")
-    bundle_id = f"stream_pulse:{window_from or 'empty'}:{window_to or generated}"
+    snapshot_digest = hashlib.sha256(
+        "\n".join(sorted(resolved_snapshot_ids)).encode("utf-8")
+    ).hexdigest()[:24]
+    bundle_id = f"stream_pulse:v2:{snapshot_digest}"
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "source": "stream_pulse",
         "bundle_id": bundle_id,
         "generated_at": generated,
@@ -167,15 +210,16 @@ def build_observation_bundle(
             "from": window_from,
             "to": window_to,
         },
+        "snapshot_counts": snapshot_counts,
         "games": games,
         "aliases": aliases,
     }
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Export a compact 24h bundle for game_catalog")
+    parser = argparse.ArgumentParser(description="Export a compact observation bundle for game_catalog")
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--hours", type=int, default=24)
+    parser.add_argument("--hours", type=int, default=168)
     args = parser.parse_args()
 
     settings = load_json(ROOT / "config" / "config.json")
@@ -186,7 +230,11 @@ def main() -> None:
     now = datetime.now(UTC)
     keys = recent_raw_keys(store, settings["raw_prefix"], now=now, hours=args.hours)
     snapshots = [store.get_json(key) for key in keys]
-    bundle = build_observation_bundle(snapshots, known_aliases=known_aliases)
+    bundle = build_observation_bundle(
+        snapshots,
+        known_aliases=known_aliases,
+        snapshot_ids=keys,
+    )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(bundle, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(
