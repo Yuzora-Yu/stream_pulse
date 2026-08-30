@@ -1,153 +1,602 @@
 {
-  "minecraft": {"display_name": "Minecraft", "status": "active"},
-  "valorant": {"display_name": "VALORANT", "status": "active"},
-  "apex-legends": {"display_name": "Apex Legends", "status": "active"},
-  "fortnite": {"display_name": "Fortnite", "status": "active"},
-  "monster-hunter-wilds": {"display_name": "Monster Hunter Wilds", "status": "active"},
-  "street-fighter-6": {"display_name": "Street Fighter 6", "status": "active"},
-  "splatoon-3": {"display_name": "スプラトゥーン3", "status": "active"},
-  "league-of-legends": {"display_name": "League of Legends", "status": "active"},
-  "genshin-impact": {"display_name": "原神", "status": "active"},
-  "honkai-star-rail": {"display_name": "崩壊：スターレイル", "status": "active"},
-  "zenless-zone-zero": {"display_name": "ゼンレスゾーンゼロ", "status": "active"},
-  "umamusume": {"display_name": "ウマ娘 プリティーダービー", "status": "active"},
-  "final-fantasy-xiv": {"display_name": "FINAL FANTASY XIV", "status": "active"},
-  "mahjong-soul": {"display_name": "雀魂", "status": "active"},
-  "dragon-quest-x": {"display_name": "ドラゴンクエストX", "status": "active"},
-  "mario-kart-world": {"display_name": "マリオカート ワールド", "status": "active"},
-  "grand-theft-auto-v": {"display_name": "Grand Theft Auto V", "status": "active"},
-  "free-fire": {"display_name": "Free Fire", "status": "active"},
-  "roblox-grow-a-garden": {"display_name": "Grow a Garden", "status": "active"},
-  "super-smash-bros-ultimate": {"display_name": "大乱闘スマッシュブラザーズ SPECIAL", "status": "active"},
-  "romancing-saga-re-universe": {"display_name": "ロマンシング サガ リ・ユニバース", "status": "active"},
-  "dead-by-daylight": {"display_name": "Dead by Daylight", "status": "active"},
-  "dragon-quest-iii": {"display_name": "ドラゴンクエストIII", "status": "active"},
-  "granblue-fantasy": {"display_name": "グランブルーファンタジー", "status": "active"},
-  "girls-frontline-2": {"display_name": "ドールズフロントライン2", "status": "active"},
-  "pokemon-champions": {"display_name": "Pokémon Champions", "status": "active"},
-  "fate-grand-order": {"display_name": "Fate/Grand Order", "status": "active"},
-  "wuthering-waves": {"display_name": "鳴潮", "status": "active"},
-  "final-fantasy-iv": {"display_name": "FINAL FANTASY IV", "status": "active"},
-  "blue-archive": {"display_name": "ブルーアーカイブ", "status": "active"},
-  "identity-v": {"display_name": "Identity V 第五人格", "status": "active"},
-  "resident-evil-requiem": {"display_name": "バイオハザード レクイエム", "status": "active"},
-  "rhythm-heaven": {"display_name": "リズム天国", "status": "active"},
-  "pokemon-scarlet-violet": {"display_name": "ポケットモンスター スカーレット・バイオレット", "status": "active"},
-  "magic-the-gathering": {"display_name": "Magic: The Gathering", "status": "active"},
-  "sky-children-of-the-light": {"display_name": "Sky 星を紡ぐ子どもたち", "status": "active"},
-  "counter-strike-2": {"display_name": "Counter-Strike 2", "status": "active"},
-  "overwatch-2": {"display_name": "Overwatch 2", "status": "active"},
-  "rainbow-six-siege": {"display_name": "レインボーシックス シージ", "status": "active"},
-  "escape-from-tarkov": {"display_name": "Escape from Tarkov", "status": "active"},
-  "call-of-duty-warzone": {"display_name": "Call of Duty: Warzone", "status": "active"},
-  "pubg-battlegrounds": {"display_name": "PUBG: BATTLEGROUNDS", "status": "active"},
-  "marvel-rivals": {"display_name": "マーベル・ライバルズ", "status": "active"},
-  "delta-force": {"display_name": "Delta Force", "status": "active"},
-  "rocket-league": {"display_name": "Rocket League", "status": "active"},
-  "fall-guys": {"display_name": "Fall Guys", "status": "active"},
-  "among-us": {"display_name": "Among Us", "status": "active"},
-  "dota-2": {"display_name": "Dota 2", "status": "active"},
-  "teamfight-tactics": {"display_name": "Teamfight Tactics", "status": "active"},
-  "tekken-8": {"display_name": "鉄拳8", "status": "active"},
-  "guilty-gear-strive": {"display_name": "GUILTY GEAR -STRIVE-", "status": "active"},
-  "granblue-fantasy-versus-rising": {"display_name": "Granblue Fantasy Versus: Rising", "status": "active"},
-  "mario-kart-8-deluxe": {"display_name": "マリオカート8 デラックス", "status": "active"},
-  "zelda-tears-of-the-kingdom": {"display_name": "ゼルダの伝説 ティアーズ オブ ザ キングダム", "status": "active"},
-  "zelda-breath-of-the-wild": {"display_name": "ゼルダの伝説 ブレス オブ ザ ワイルド", "status": "active"},
-  "animal-crossing-new-horizons": {"display_name": "あつまれ どうぶつの森", "status": "active"},
-  "super-mario-maker-2": {"display_name": "スーパーマリオメーカー2", "status": "active"},
-  "pokemon-go": {"display_name": "Pokémon GO", "status": "active"},
-  "pokemon-unite": {"display_name": "Pokémon UNITE", "status": "active"},
-  "pokemon-legends-z-a": {"display_name": "Pokémon LEGENDS Z-A", "status": "active"},
-  "nikke": {"display_name": "勝利の女神：NIKKE", "status": "active"},
-  "arknights": {"display_name": "アークナイツ", "status": "active"},
-  "azur-lane": {"display_name": "アズールレーン", "status": "active"},
-  "heaven-burns-red": {"display_name": "ヘブンバーンズレッド", "status": "active"},
-  "project-sekai": {"display_name": "プロジェクトセカイ", "status": "active"},
-  "puzzle-and-dragons": {"display_name": "パズル＆ドラゴンズ", "status": "active"},
-  "monster-strike": {"display_name": "モンスターストライク", "status": "active"},
-  "dragon-ball-z-dokkan-battle": {"display_name": "ドラゴンボールZ ドッカンバトル", "status": "active"},
-  "one-piece-bounty-rush": {"display_name": "ONE PIECE バウンティラッシュ", "status": "active"},
-  "shadowverse-worlds-beyond": {"display_name": "Shadowverse: Worlds Beyond", "status": "active"},
-  "yu-gi-oh-master-duel": {"display_name": "遊戯王 マスターデュエル", "status": "active"},
-  "hearthstone": {"display_name": "ハースストーン", "status": "active"},
-  "final-fantasy-xi": {"display_name": "FINAL FANTASY XI", "status": "active"},
-  "pso2-new-genesis": {"display_name": "PSO2 ニュージェネシス", "status": "active"},
-  "world-of-warcraft": {"display_name": "World of Warcraft", "status": "active"},
-  "lost-ark": {"display_name": "LOST ARK", "status": "active"},
-  "black-desert-online": {"display_name": "黒い砂漠", "status": "active"},
-  "rust": {"display_name": "Rust", "status": "active"},
-  "ark-survival-ascended": {"display_name": "ARK: Survival Ascended", "status": "active"},
-  "palworld": {"display_name": "Palworld", "status": "active"},
-  "terraria": {"display_name": "Terraria", "status": "active"},
-  "seven-days-to-die": {"display_name": "7 Days to Die", "status": "active"},
-  "project-zomboid": {"display_name": "Project Zomboid", "status": "active"},
-  "phasmophobia": {"display_name": "Phasmophobia", "status": "active"},
-  "lethal-company": {"display_name": "Lethal Company", "status": "active"},
-  "euro-truck-simulator-2": {"display_name": "Euro Truck Simulator 2", "status": "active"},
-  "efootball": {"display_name": "eFootball", "status": "active"},
-  "pro-yakyuu-spirits-a": {"display_name": "プロ野球スピリッツA", "status": "active"},
-  "powerful-pro-yakyuu": {"display_name": "実況パワフルプロ野球", "status": "active"},
-  "the-sims-4": {"display_name": "The Sims 4", "status": "active"},
-  "cities-skylines-ii": {"display_name": "Cities: Skylines II", "status": "active"},
-  "monster-hunter-rise-sunbreak": {"display_name": "モンスターハンターライズ：サンブレイク", "status": "active"},
-  "elden-ring": {"display_name": "ELDEN RING", "status": "active"},
-  "dark-souls-iii": {"display_name": "DARK SOULS III", "status": "active"},
-  "sekiro": {"display_name": "SEKIRO: SHADOWS DIE TWICE", "status": "active"},
-  "clair-obscur-expedition-33": {"display_name": "Clair Obscur: Expedition 33", "status": "active"},
-  "metaphor-refantazio": {"display_name": "メタファー：リファンタジオ", "status": "active"},
-  "persona-5-royal": {"display_name": "ペルソナ5 ザ・ロイヤル", "status": "active"},
-  "kiteretsu-sodan-dial": {"display_name": "奇天烈相談ダイヤル", "status": "active"},
-  "urban-myth-dissolution-center": {"display_name": "都市伝説解体センター", "status": "active"},
-  "paranormasight": {"display_name": "パラノマサイト FILE23 本所七不思議", "status": "active"},
-  "the-exit-8": {"display_name": "8番出口", "status": "active"},
-  "platform-8": {"display_name": "8番のりば", "status": "active"},
-  "japan-stigmatized-property": {"display_name": "日本事故物件監視協会", "status": "active"},
-  "homicipher": {"display_name": "文字化化", "status": "active"},
-  "night-security": {"display_name": "夜間警備", "status": "active"},
-  "the-convenience-store": {"display_name": "夜勤事件", "status": "active"},
-  "the-closing-shift": {"display_name": "閉店事件", "status": "active"},
-  "the-bathhouse": {"display_name": "地獄銭湯", "status": "active"},
-  "parasocial": {"display_name": "パラソーシャル", "status": "active"},
-  "the-karaoke": {"display_name": "ヒトカラ", "status": "active"},
-  "shinkansen-0": {"display_name": "新幹線0号", "status": "active"},
-  "the-kidnap": {"display_name": "誘拐事件", "status": "active"},
-  "umigari": {"display_name": "ウミガリ", "status": "active"},
-  "tarou-kun-came-in": {"display_name": "たろうくんはいってきました", "status": "active"},
-  "sessou": {"display_name": "雪葬", "status": "active"},
-  "buckshot-roulette": {"display_name": "Buckshot Roulette", "status": "active"},
-  "miside": {"display_name": "MiSide", "status": "active"},
-  "mouthwashing": {"display_name": "Mouthwashing", "status": "active"},
-  "peak": {"display_name": "PEAK", "status": "active"},
-  "repo": {"display_name": "R.E.P.O.", "status": "active"},
-  "content-warning": {"display_name": "Content Warning", "status": "active"},
-  "chained-together": {"display_name": "Chained Together", "status": "active"},
-  "only-up": {"display_name": "Only Up!", "status": "active"},
-  "getting-over-it": {"display_name": "Getting Over It", "status": "active"},
-  "jump-king": {"display_name": "Jump King", "status": "active"},
-  "suika-game": {"display_name": "スイカゲーム", "status": "active"},
-  "vampire-survivors": {"display_name": "Vampire Survivors", "status": "active"},
-  "hades": {"display_name": "Hades", "status": "active"},
-  "hades-ii": {"display_name": "Hades II", "status": "active"},
-  "hollow-knight": {"display_name": "Hollow Knight", "status": "active"},
-  "hollow-knight-silksong": {"display_name": "Hollow Knight: Silksong", "status": "active"},
-  "balatro": {"display_name": "Balatro", "status": "active"},
-  "slay-the-spire": {"display_name": "Slay the Spire", "status": "active"},
-  "stardew-valley": {"display_name": "Stardew Valley", "status": "active"},
-  "undertale": {"display_name": "UNDERTALE", "status": "active"},
-  "deltarune": {"display_name": "DELTARUNE", "status": "active"},
-  "omori": {"display_name": "OMORI", "status": "active"},
-  "cuphead": {"display_name": "Cuphead", "status": "active"},
-  "celeste": {"display_name": "Celeste", "status": "active"},
-  "rimworld": {"display_name": "RimWorld", "status": "active"},
-  "factorio": {"display_name": "Factorio", "status": "active"},
-  "satisfactory": {"display_name": "Satisfactory", "status": "active"},
-  "core-keeper": {"display_name": "Core Keeper", "status": "active"},
-  "dave-the-diver": {"display_name": "DAVE THE DIVER", "status": "active"},
-  "cult-of-the-lamb": {"display_name": "Cult of the Lamb", "status": "active"},
-  "inscryption": {"display_name": "Inscryption", "status": "active"},
-  "papers-please": {"display_name": "Papers, Please", "status": "active"},
-  "little-nightmares": {"display_name": "Little Nightmares", "status": "active"},
-  "little-nightmares-ii": {"display_name": "Little Nightmares II", "status": "active"}
+  "among-us": {
+    "display_name": "Among Us",
+    "status": "active"
+  },
+  "animal-crossing-new-horizons": {
+    "display_name": "あつまれ どうぶつの森",
+    "status": "active"
+  },
+  "apex-legends": {
+    "display_name": "Apex Legends",
+    "status": "active"
+  },
+  "ark-survival-ascended": {
+    "display_name": "ARK: Survival Ascended",
+    "status": "active"
+  },
+  "arknights": {
+    "display_name": "アークナイツ",
+    "status": "active"
+  },
+  "azur-lane": {
+    "display_name": "アズールレーン",
+    "status": "active"
+  },
+  "balatro": {
+    "display_name": "Balatro",
+    "status": "active"
+  },
+  "black-desert-online": {
+    "display_name": "黒い砂漠",
+    "status": "active"
+  },
+  "blue-archive": {
+    "display_name": "ブルーアーカイブ",
+    "status": "active"
+  },
+  "buckshot-roulette": {
+    "display_name": "Buckshot Roulette",
+    "status": "active"
+  },
+  "call-of-duty-warzone": {
+    "display_name": "Call of Duty: Warzone",
+    "status": "active"
+  },
+  "celeste": {
+    "display_name": "Celeste",
+    "status": "active"
+  },
+  "chained-together": {
+    "display_name": "Chained Together",
+    "status": "active"
+  },
+  "cities-skylines-ii": {
+    "display_name": "Cities: Skylines II",
+    "status": "active"
+  },
+  "clair-obscur-expedition-33": {
+    "display_name": "Clair Obscur: Expedition 33",
+    "status": "active"
+  },
+  "content-warning": {
+    "display_name": "Content Warning",
+    "status": "active"
+  },
+  "core-keeper": {
+    "display_name": "Core Keeper",
+    "status": "active"
+  },
+  "counter-strike-2": {
+    "display_name": "Counter-Strike 2",
+    "status": "active"
+  },
+  "cult-of-the-lamb": {
+    "display_name": "Cult of the Lamb",
+    "status": "active"
+  },
+  "cuphead": {
+    "display_name": "Cuphead",
+    "status": "active"
+  },
+  "dark-souls-iii": {
+    "display_name": "DARK SOULS III",
+    "status": "active"
+  },
+  "dave-the-diver": {
+    "display_name": "DAVE THE DIVER",
+    "status": "active"
+  },
+  "dead-by-daylight": {
+    "display_name": "Dead by Daylight",
+    "status": "active"
+  },
+  "delta-force": {
+    "display_name": "Delta Force",
+    "status": "active"
+  },
+  "deltarune": {
+    "display_name": "DELTARUNE",
+    "status": "active"
+  },
+  "dota-2": {
+    "display_name": "Dota 2",
+    "status": "active"
+  },
+  "dragon-ball-z-dokkan-battle": {
+    "display_name": "ドラゴンボールZ ドッカンバトル",
+    "status": "active"
+  },
+  "dragon-quest-iii": {
+    "display_name": "ドラゴンクエストIII",
+    "status": "active"
+  },
+  "dragon-quest-x": {
+    "display_name": "ドラゴンクエストX",
+    "status": "active"
+  },
+  "efootball": {
+    "display_name": "eFootball",
+    "status": "active"
+  },
+  "elden-ring": {
+    "display_name": "ELDEN RING",
+    "status": "active"
+  },
+  "escape-from-tarkov": {
+    "display_name": "Escape from Tarkov",
+    "status": "active"
+  },
+  "euro-truck-simulator-2": {
+    "display_name": "Euro Truck Simulator 2",
+    "status": "active"
+  },
+  "factorio": {
+    "display_name": "Factorio",
+    "status": "active"
+  },
+  "fall-guys": {
+    "display_name": "Fall Guys",
+    "status": "active"
+  },
+  "fate-grand-order": {
+    "display_name": "Fate/Grand Order",
+    "status": "active"
+  },
+  "final-fantasy-iv": {
+    "display_name": "FINAL FANTASY IV",
+    "status": "active"
+  },
+  "final-fantasy-xi": {
+    "display_name": "FINAL FANTASY XI",
+    "status": "active"
+  },
+  "final-fantasy-xiv": {
+    "display_name": "FINAL FANTASY XIV",
+    "status": "active"
+  },
+  "fortnite": {
+    "display_name": "Fortnite",
+    "status": "active"
+  },
+  "free-fire": {
+    "display_name": "Free Fire",
+    "status": "active"
+  },
+  "genshin-impact": {
+    "display_name": "原神",
+    "status": "active"
+  },
+  "getting-over-it": {
+    "display_name": "Getting Over It",
+    "status": "active"
+  },
+  "girls-frontline-2": {
+    "display_name": "ドールズフロントライン2",
+    "status": "active"
+  },
+  "granblue-fantasy-versus-rising": {
+    "display_name": "Granblue Fantasy Versus: Rising",
+    "status": "active"
+  },
+  "granblue-fantasy": {
+    "display_name": "グランブルーファンタジー",
+    "status": "active"
+  },
+  "grand-theft-auto-v": {
+    "display_name": "Grand Theft Auto V",
+    "status": "active"
+  },
+  "guilty-gear-strive": {
+    "display_name": "GUILTY GEAR -STRIVE-",
+    "status": "active"
+  },
+  "hades-ii": {
+    "display_name": "Hades II",
+    "status": "active"
+  },
+  "hades": {
+    "display_name": "Hades",
+    "status": "active"
+  },
+  "hearthstone": {
+    "display_name": "ハースストーン",
+    "status": "active"
+  },
+  "heaven-burns-red": {
+    "display_name": "ヘブンバーンズレッド",
+    "status": "active"
+  },
+  "hollow-knight-silksong": {
+    "display_name": "Hollow Knight: Silksong",
+    "status": "active"
+  },
+  "hollow-knight": {
+    "display_name": "Hollow Knight",
+    "status": "active"
+  },
+  "homicipher": {
+    "display_name": "文字化化",
+    "status": "active"
+  },
+  "honkai-star-rail": {
+    "display_name": "崩壊：スターレイル",
+    "status": "active"
+  },
+  "identity-v": {
+    "display_name": "Identity V 第五人格",
+    "status": "active"
+  },
+  "inscryption": {
+    "display_name": "Inscryption",
+    "status": "active"
+  },
+  "japan-stigmatized-property": {
+    "display_name": "日本事故物件監視協会",
+    "status": "active"
+  },
+  "jump-king": {
+    "display_name": "Jump King",
+    "status": "active"
+  },
+  "kiteretsu-sodan-dial": {
+    "display_name": "奇天烈相談ダイヤル",
+    "status": "active"
+  },
+  "league-of-legends": {
+    "display_name": "League of Legends",
+    "status": "active"
+  },
+  "lethal-company": {
+    "display_name": "Lethal Company",
+    "status": "active"
+  },
+  "little-nightmares-ii": {
+    "display_name": "Little Nightmares II",
+    "status": "active"
+  },
+  "little-nightmares": {
+    "display_name": "Little Nightmares",
+    "status": "active"
+  },
+  "lost-ark": {
+    "display_name": "LOST ARK",
+    "status": "active"
+  },
+  "magic-the-gathering": {
+    "display_name": "Magic: The Gathering",
+    "status": "active"
+  },
+  "mahjong-soul": {
+    "display_name": "雀魂",
+    "status": "active"
+  },
+  "mario-kart-8-deluxe": {
+    "display_name": "マリオカート8 デラックス",
+    "status": "active"
+  },
+  "mario-kart-world": {
+    "display_name": "マリオカート ワールド",
+    "status": "active"
+  },
+  "marvel-rivals": {
+    "display_name": "マーベル・ライバルズ",
+    "status": "active"
+  },
+  "metaphor-refantazio": {
+    "display_name": "メタファー：リファンタジオ",
+    "status": "active"
+  },
+  "minecraft": {
+    "display_name": "Minecraft",
+    "status": "active"
+  },
+  "miside": {
+    "display_name": "MiSide",
+    "status": "active"
+  },
+  "monster-hunter-rise-sunbreak": {
+    "display_name": "モンスターハンターライズ：サンブレイク",
+    "status": "active"
+  },
+  "monster-hunter-wilds": {
+    "display_name": "Monster Hunter Wilds",
+    "status": "active"
+  },
+  "monster-strike": {
+    "display_name": "モンスターストライク",
+    "status": "active"
+  },
+  "mouthwashing": {
+    "display_name": "Mouthwashing",
+    "status": "active"
+  },
+  "night-security": {
+    "display_name": "夜間警備",
+    "status": "active"
+  },
+  "nikke": {
+    "display_name": "勝利の女神：NIKKE",
+    "status": "active"
+  },
+  "omori": {
+    "display_name": "OMORI",
+    "status": "active"
+  },
+  "one-piece-bounty-rush": {
+    "display_name": "ONE PIECE バウンティラッシュ",
+    "status": "active"
+  },
+  "only-up": {
+    "display_name": "Only Up!",
+    "status": "active"
+  },
+  "overwatch-2": {
+    "display_name": "Overwatch 2",
+    "status": "active"
+  },
+  "palworld": {
+    "display_name": "Palworld",
+    "status": "active"
+  },
+  "papers-please": {
+    "display_name": "Papers, Please",
+    "status": "active"
+  },
+  "paranormasight": {
+    "display_name": "パラノマサイト FILE23 本所七不思議",
+    "status": "active"
+  },
+  "parasocial": {
+    "display_name": "パラソーシャル",
+    "status": "active"
+  },
+  "peak": {
+    "display_name": "PEAK",
+    "status": "active"
+  },
+  "persona-5-royal": {
+    "display_name": "ペルソナ5 ザ・ロイヤル",
+    "status": "active"
+  },
+  "phasmophobia": {
+    "display_name": "Phasmophobia",
+    "status": "active"
+  },
+  "platform-8": {
+    "display_name": "8番のりば",
+    "status": "active"
+  },
+  "pokemon-champions": {
+    "display_name": "Pokémon Champions",
+    "status": "active"
+  },
+  "pokemon-go": {
+    "display_name": "Pokémon GO",
+    "status": "active"
+  },
+  "pokemon-legends-z-a": {
+    "display_name": "Pokémon LEGENDS Z-A",
+    "status": "active"
+  },
+  "pokemon-scarlet-violet": {
+    "display_name": "ポケットモンスター スカーレット・バイオレット",
+    "status": "active"
+  },
+  "pokemon-unite": {
+    "display_name": "Pokémon UNITE",
+    "status": "active"
+  },
+  "powerful-pro-yakyuu": {
+    "display_name": "実況パワフルプロ野球",
+    "status": "active"
+  },
+  "pro-yakyuu-spirits-a": {
+    "display_name": "プロ野球スピリッツA",
+    "status": "active"
+  },
+  "project-sekai": {
+    "display_name": "プロジェクトセカイ",
+    "status": "active"
+  },
+  "project-zomboid": {
+    "display_name": "Project Zomboid",
+    "status": "active"
+  },
+  "pso2-new-genesis": {
+    "display_name": "PSO2 ニュージェネシス",
+    "status": "active"
+  },
+  "pubg-battlegrounds": {
+    "display_name": "PUBG: BATTLEGROUNDS",
+    "status": "active"
+  },
+  "puzzle-and-dragons": {
+    "display_name": "パズル＆ドラゴンズ",
+    "status": "active"
+  },
+  "rainbow-six-siege": {
+    "display_name": "レインボーシックス シージ",
+    "status": "active"
+  },
+  "repo": {
+    "display_name": "R.E.P.O.",
+    "status": "active"
+  },
+  "resident-evil-requiem": {
+    "display_name": "バイオハザード レクイエム",
+    "status": "active"
+  },
+  "rhythm-heaven": {
+    "display_name": "リズム天国",
+    "status": "active"
+  },
+  "rimworld": {
+    "display_name": "RimWorld",
+    "status": "active"
+  },
+  "roblox-grow-a-garden": {
+    "display_name": "Grow a Garden",
+    "status": "active"
+  },
+  "rocket-league": {
+    "display_name": "Rocket League",
+    "status": "active"
+  },
+  "romancing-saga-re-universe": {
+    "display_name": "ロマンシング サガ リ・ユニバース",
+    "status": "active"
+  },
+  "rust": {
+    "display_name": "Rust",
+    "status": "active"
+  },
+  "satisfactory": {
+    "display_name": "Satisfactory",
+    "status": "active"
+  },
+  "sekiro": {
+    "display_name": "SEKIRO: SHADOWS DIE TWICE",
+    "status": "active"
+  },
+  "sessou": {
+    "display_name": "雪葬",
+    "status": "active"
+  },
+  "seven-days-to-die": {
+    "display_name": "7 Days to Die",
+    "status": "active"
+  },
+  "shadowverse-worlds-beyond": {
+    "display_name": "Shadowverse: Worlds Beyond",
+    "status": "active"
+  },
+  "shinkansen-0": {
+    "display_name": "新幹線0号",
+    "status": "active"
+  },
+  "sky-children-of-the-light": {
+    "display_name": "Sky 星を紡ぐ子どもたち",
+    "status": "active"
+  },
+  "slay-the-spire": {
+    "display_name": "Slay the Spire",
+    "status": "active"
+  },
+  "splatoon-3": {
+    "display_name": "スプラトゥーン3",
+    "status": "active"
+  },
+  "stardew-valley": {
+    "display_name": "Stardew Valley",
+    "status": "active"
+  },
+  "street-fighter-6": {
+    "display_name": "Street Fighter 6",
+    "status": "active"
+  },
+  "suika-game": {
+    "display_name": "スイカゲーム",
+    "status": "active"
+  },
+  "super-mario-maker-2": {
+    "display_name": "スーパーマリオメーカー2",
+    "status": "active"
+  },
+  "super-smash-bros-ultimate": {
+    "display_name": "大乱闘スマッシュブラザーズ SPECIAL",
+    "status": "active"
+  },
+  "tarou-kun-came-in": {
+    "display_name": "たろうくんはいってきました",
+    "status": "active"
+  },
+  "teamfight-tactics": {
+    "display_name": "Teamfight Tactics",
+    "status": "active"
+  },
+  "tekken-8": {
+    "display_name": "鉄拳8",
+    "status": "active"
+  },
+  "terraria": {
+    "display_name": "Terraria",
+    "status": "active"
+  },
+  "the-bathhouse": {
+    "display_name": "地獄銭湯",
+    "status": "active"
+  },
+  "the-closing-shift": {
+    "display_name": "閉店事件",
+    "status": "active"
+  },
+  "the-convenience-store": {
+    "display_name": "夜勤事件",
+    "status": "active"
+  },
+  "the-exit-8": {
+    "display_name": "8番出口",
+    "status": "active"
+  },
+  "the-karaoke": {
+    "display_name": "ヒトカラ",
+    "status": "active"
+  },
+  "the-kidnap": {
+    "display_name": "誘拐事件",
+    "status": "active"
+  },
+  "the-sims-4": {
+    "display_name": "The Sims 4",
+    "status": "active"
+  },
+  "umamusume": {
+    "display_name": "ウマ娘 プリティーダービー",
+    "status": "active"
+  },
+  "umigari": {
+    "display_name": "ウミガリ",
+    "status": "active"
+  },
+  "undertale": {
+    "display_name": "UNDERTALE",
+    "status": "active"
+  },
+  "urban-myth-dissolution-center": {
+    "display_name": "都市伝説解体センター",
+    "status": "active"
+  },
+  "valorant": {
+    "display_name": "VALORANT",
+    "status": "active"
+  },
+  "vampire-survivors": {
+    "display_name": "Vampire Survivors",
+    "status": "active"
+  },
+  "world-of-warcraft": {
+    "display_name": "World of Warcraft",
+    "status": "active"
+  },
+  "wuthering-waves": {
+    "display_name": "鳴潮",
+    "status": "active"
+  },
+  "yu-gi-oh-master-duel": {
+    "display_name": "遊戯王 マスターデュエル",
+    "status": "active"
+  },
+  "zelda-breath-of-the-wild": {
+    "display_name": "ゼルダの伝説 ブレス オブ ザ ワイルド",
+    "status": "active"
+  },
+  "zelda-tears-of-the-kingdom": {
+    "display_name": "ゼルダの伝説 ティアーズ オブ ザ キングダム",
+    "status": "active"
+  },
+  "zenless-zone-zero": {
+    "display_name": "ゼンレスゾーンゼロ",
+    "status": "active"
+  }
 }
-
